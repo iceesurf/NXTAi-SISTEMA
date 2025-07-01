@@ -123,10 +123,13 @@ Changelog:
   - Sistema otimizado para deploy no Replit
   - Entry point universal (index.js) configurado
   - Todas as referências corrigidas para NXT.ai
-  - Dados reais inseridos no banco (7 leads, 4 campanhas, 3 conversações, 5 integrações, 5 automações, 4 API keys)
-  - Sistema funcional com dados demonstrativos para produção
+  - Sistema configurado como SaaS B2B para venda
+  - Usuários: samuel@dnxtai.com e leonardo@dnxtai.com (co-fundadores)
+  - Página de cadastro de empresas (/signup)
+  - API de cadastro de tenants B2B
+  - Dados fictícios removidos - sistema limpo para produção
   - Layout corrigido (menu lateral não duplica mais)
-  - Pronto para deploy e configuração de domínio dnxtai.com
+  - Pronto para deploy e venda para empresas
 
 ## User Preferences
 

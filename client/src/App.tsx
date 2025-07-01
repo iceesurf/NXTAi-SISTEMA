@@ -19,6 +19,7 @@ import ApiDocs from "@/pages/api-docs";
 import Team from "@/pages/team";
 import Settings from "@/pages/settings";
 import Onboarding from "@/pages/onboarding";
+import TenantSignup from "@/pages/tenant-signup";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -46,6 +47,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
+      <Route path="/signup" component={TenantSignup} />
       <Route>
         <ProtectedWrapper>
           <Layout>

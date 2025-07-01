@@ -233,8 +233,21 @@ export default function AuthPage() {
             </div>
           </div>
 
-          <div className="text-sm text-white/80">
+          <div className="text-sm text-white/80 mb-6">
             ✨ Multi-tenant • 🔐 Seguro • 🚀 Escalável
+          </div>
+          
+          <div className="border-t border-white/20 pt-6">
+            <p className="text-sm text-white/80 mb-3">
+              Não tem uma conta empresarial?
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = "/signup"}
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+            >
+              Cadastrar Empresa
+            </Button>
           </div>
         </div>
       </div>

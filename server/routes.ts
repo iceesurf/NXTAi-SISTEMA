@@ -16,6 +16,78 @@ function requireAuth(req: any, res: any, next: any) {
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // API para cadastro de empresas (B2B SaaS)
+  app.post("/api/tenant/signup", async (req, res) => {
+    try {
+      const {
+        companyName,
+        adminFirstName,
+        adminLastName,
+        adminEmail,
+        adminPassword,
+        phone,
+        industry,
+        employees,
+        description,
+        website
+      } = req.body;
+
+      // Verificar se email já existe
+      const existingUser = await storage.getUserByEmail(adminEmail);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email já cadastrado" });
+      }
+
+      // Criar slug único para empresa
+      const slug = companyName
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      // Verificar se slug já existe
+      const existingTenant = await storage.getTenantBySlug(slug);
+      if (existingTenant) {
+        return res.status(400).json({ error: "Nome da empresa já em uso" });
+      }
+
+      // Criar tenant (empresa)
+      const tenant = await storage.createTenant({
+        name: companyName,
+        slug: slug,
+        domain: `${slug}.dnxtai.com`,
+        primaryColor: "#6E00FF",
+        secondaryColor: "#9A4DFF",
+        accentColor: "#4B0082"
+      });
+
+      // Hash da senha
+      const bcrypt = require('bcrypt');
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+      // Criar usuário admin
+      await storage.createUser({
+        username: adminEmail,
+        email: adminEmail,
+        password: hashedPassword,
+        firstName: adminFirstName,
+        lastName: adminLastName,
+        role: "admin",
+        tenantId: tenant.id
+      });
+
+      res.status(201).json({ 
+        message: "Empresa cadastrada com sucesso",
+        tenantId: tenant.id,
+        slug: slug
+      });
+
+    } catch (error) {
+      console.error("Erro no cadastro:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Dashboard stats
   app.get("/api/stats", requireAuth, async (req, res) => {
     try {
