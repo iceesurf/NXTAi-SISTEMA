@@ -25,7 +25,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  role: text("role").notNull().default("user"), // admin, user, collaborator
+  role: text("role").notNull().default("user"), // super_admin, admin, user, collaborator
+  isSuperAdmin: boolean("is_super_admin").default(false),
   tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),

@@ -356,6 +356,128 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Rota administrativa para seed de dados (apenas para super admin)
+  app.post("/api/admin/seed", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado - apenas super admin" });
+      }
+
+      // Criar dados de demonstração para clientes
+      const clientTenant = await storage.createTenant({
+        name: "TechStart Brasil",
+        slug: "techstart-demo",
+        domain: "techstart.dnxtai.com",
+        primaryColor: "#0066CC",
+        secondaryColor: "#FF6600",
+        accentColor: "#00CC66"
+      });
+
+      // Criar usuário cliente
+      const clientUser = await storage.createUser({
+        username: "demo@techstart.com",
+        email: "demo@techstart.com",
+        password: "$hashed$demo$password", // Password fictício para demo
+        firstName: "Demo",
+        lastName: "Cliente",
+        role: "admin",
+        isSuperAdmin: false,
+        tenantId: clientTenant.id
+      });
+
+      // Criar leads de demonstração
+      const demoLeads = [
+        {
+          name: "Pedro Silva",
+          email: "pedro@empresa.com.br",
+          phone: "+55 11 99999-1234",
+          company: "Empresa Tech",
+          position: "CTO",
+          source: "website",
+          status: "qualified",
+          tags: ["tecnologia", "interessado"],
+          notes: "Lead qualificado, demonstrou interesse em automações",
+          tenantId: clientTenant.id,
+          assignedTo: clientUser.id
+        },
+        {
+          name: "Ana Costa",
+          email: "ana@startup.com.br",
+          phone: "+55 11 88888-5678",
+          company: "StartupXYZ",
+          position: "CMO",
+          source: "linkedin",
+          status: "new",
+          tags: ["marketing", "startup"],
+          notes: "Primeiro contato, aguardando retorno",
+          tenantId: clientTenant.id,
+          assignedTo: clientUser.id
+        },
+        {
+          name: "Carlos Mendes",
+          email: "carlos@consultoria.com.br",
+          phone: "+55 21 77777-9012",
+          company: "Consultoria Premium",
+          position: "Diretor",
+          source: "indicacao",
+          status: "contacted",
+          tags: ["consultoria", "B2B"],
+          notes: "Reunião agendada para próxima semana",
+          tenantId: clientTenant.id,
+          assignedTo: clientUser.id
+        }
+      ];
+
+      for (const leadData of demoLeads) {
+        await storage.createLead(leadData);
+      }
+
+      // Criar campanhas de demonstração
+      const demoCampaigns = [
+        {
+          name: "Welcome Series",
+          type: "email",
+          subject: "Bem-vindo ao nosso sistema!",
+          content: "Olá! Obrigado por se cadastrar. Vamos começar sua jornada!",
+          status: "sent",
+          recipientCount: 50,
+          openCount: 32,
+          clickCount: 15,
+          tenantId: clientTenant.id,
+          createdBy: clientUser.id
+        },
+        {
+          name: "Reativação de Leads",
+          type: "whatsapp",
+          subject: "Que tal retomar nossa conversa?",
+          content: "Oi! Notamos que você demonstrou interesse. Posso ajudar?",
+          status: "scheduled",
+          recipientCount: 0,
+          openCount: 0,
+          clickCount: 0,
+          tenantId: clientTenant.id,
+          createdBy: clientUser.id
+        }
+      ];
+
+      for (const campaignData of demoCampaigns) {
+        await storage.createCampaign(campaignData);
+      }
+
+      res.json({ 
+        message: "Dados de demonstração criados com sucesso!",
+        tenant: clientTenant,
+        leadsCount: demoLeads.length,
+        campaignsCount: demoCampaigns.length
+      });
+
+    } catch (error) {
+      console.error("Erro no seed:", error);
+      res.status(500).json({ message: "Erro ao criar dados de demonstração" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
