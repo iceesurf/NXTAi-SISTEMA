@@ -20,6 +20,7 @@ import Team from "@/pages/team";
 import Settings from "@/pages/settings";
 import Onboarding from "@/pages/onboarding";
 import TenantSignup from "@/pages/tenant-signup";
+import AdminPanel from "@/pages/admin-panel";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -62,6 +63,7 @@ function Router() {
               <Route path="/team" component={Team} />
               <Route path="/settings" component={Settings} />
               <Route path="/onboarding" component={Onboarding} />
+              <Route path="/admin" component={AdminPanel} />
               <Route component={NotFound} />
             </Switch>
           </Layout>

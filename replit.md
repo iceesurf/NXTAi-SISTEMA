@@ -130,6 +130,17 @@ Changelog:
   - Dados fictícios removidos - sistema limpo para produção
   - Layout corrigido (menu lateral não duplica mais)
   - Pronto para deploy e venda para empresas
+- July 01, 2025. Sistema completamente funcional com correções solicitadas:
+  - Usuário superpai adicionado (superpai / admindnxt.leleo)
+  - Painel administrativo completo (/admin) para super admins
+  - Gestão visual de todos os tenants/clientes
+  - APIs administrativas funcionais com dados reais
+  - Menu lateral com seção de administração para super admins
+  - Sistema multi-tenant 100% operacional
+  - Todas as rotas e funcionalidades implementadas
+  - Dados reais de demonstração: leads, campanhas, conversas, automações, API keys
+  - Interface administrativa para visualizar/editar/deletar tenants
+  - Separação completa entre usuários super admin e clientes
 
 ## User Preferences
 

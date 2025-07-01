@@ -11,7 +11,8 @@ import {
   Code, 
   Settings, 
   LogOut,
-  BookOpen
+  BookOpen,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/logo";
@@ -64,6 +65,30 @@ export default function Sidebar() {
               </Link>
             );
           })}
+          
+          {/* Admin Menu - apenas para super admins */}
+          {user.isSuperAdmin && (
+            <>
+              <div className="my-4 border-t border-sidebar-border"></div>
+              <div className="px-3 mb-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Administração
+                </p>
+              </div>
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3 h-10",
+                    location === "/admin" && "bg-accent text-accent-foreground"
+                  )}
+                >
+                  <Shield className="w-5 h-5" />
+                  <span>Painel Admin</span>
+                </Button>
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* User Info */}

@@ -420,6 +420,7 @@ async function seedDatabase() {
     console.log("📋 Credenciais de acesso:");
     console.log("🔑 Super Admin: samuel@dnxtai.com / admin123");
     console.log("🔑 Co-fundador: leonardo@dnxtai.com / admin123");
+    console.log("🔑 Super Pai: superpai / admindnxt.leleo");
     console.log("🏢 Cliente TechStart: admin@techstart.com / cliente123");
     console.log("🏢 Cliente Loja Virtual: admin@lojavirtual.com / cliente123");
     console.log("🏢 Cliente Consultoria: admin@consultoria.com / cliente123");

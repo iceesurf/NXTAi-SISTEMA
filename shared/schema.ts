@@ -13,6 +13,7 @@ export const tenants = pgTable("tenants", {
   primaryColor: text("primary_color").default("#6E00FF"),
   secondaryColor: text("secondary_color").default("#FF2CB4"),
   accentColor: text("accent_color").default("#00F5FF"),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

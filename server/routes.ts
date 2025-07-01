@@ -478,6 +478,91 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Admin routes (apenas para super admins)
+  app.get("/api/admin/stats", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      // Buscar estatísticas gerais do sistema
+      const allTenants = await storage.getAllTenants?.() || [];
+      const allUsers = await storage.getAllUsers?.() || [];
+      const allLeads = await storage.getAllLeads?.() || [];
+
+      res.json({
+        totalTenants: allTenants.length,
+        activeTenants: allTenants.filter(t => t.isActive).length,
+        totalUsers: allUsers.length,
+        totalLeads: allLeads.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar estatísticas" });
+    }
+  });
+
+  app.get("/api/admin/tenants", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const tenants = await storage.getAllTenants?.() || [];
+      
+      // Adicionar contadores para cada tenant
+      const tenantsWithStats = await Promise.all(
+        tenants.map(async (tenant) => {
+          const users = await storage.getUsersByTenant(tenant.id);
+          const leads = await storage.getLeadsByTenant(tenant.id);
+          const campaigns = await storage.getCampaignsByTenant(tenant.id);
+          
+          return {
+            ...tenant,
+            userCount: users.length,
+            leadCount: leads.length,
+            campaignCount: campaigns.length,
+          };
+        })
+      );
+
+      res.json(tenantsWithStats);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar tenants" });
+    }
+  });
+
+  app.patch("/api/admin/tenants/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const tenant = await storage.updateTenant(parseInt(id), req.body);
+      res.json(tenant);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao atualizar tenant" });
+    }
+  });
+
+  app.delete("/api/admin/tenants/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      await storage.deleteTenant?.(parseInt(id));
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao deletar tenant" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

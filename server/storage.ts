@@ -39,18 +39,22 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getUsersByTenant(tenantId: number): Promise<User[]>;
+  getAllUsers(): Promise<User[]>;
   
   // Tenants
   getTenant(id: number): Promise<Tenant | undefined>;
   getTenantBySlug(slug: string): Promise<Tenant | undefined>;
   createTenant(tenant: InsertTenant): Promise<Tenant>;
   updateTenant(id: number, tenant: Partial<InsertTenant>): Promise<Tenant>;
+  getAllTenants(): Promise<Tenant[]>;
+  deleteTenant(id: number): Promise<void>;
   
   // Leads
   getLeadsByTenant(tenantId: number): Promise<Lead[]>;
   createLead(lead: InsertLead): Promise<Lead>;
   updateLead(id: number, lead: Partial<InsertLead>): Promise<Lead>;
   deleteLead(id: number): Promise<void>;
+  getAllLeads(): Promise<Lead[]>;
   
   // Campaigns
   getCampaignsByTenant(tenantId: number): Promise<Campaign[]>;
@@ -78,11 +82,11 @@ export interface IStorage {
   createApiKey(apiKey: InsertApiKey): Promise<ApiKey>;
   deleteApiKey(id: number): Promise<void>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({ 
@@ -147,6 +151,18 @@ export class DatabaseStorage implements IStorage {
     return tenant;
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async getAllTenants(): Promise<Tenant[]> {
+    return await db.select().from(tenants);
+  }
+
+  async deleteTenant(id: number): Promise<void> {
+    await db.delete(tenants).where(eq(tenants.id, id));
+  }
+
   // Leads
   async getLeadsByTenant(tenantId: number): Promise<Lead[]> {
     return await db.select().from(leads).where(eq(leads.tenantId, tenantId)).orderBy(desc(leads.createdAt));
@@ -171,6 +187,10 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLead(id: number): Promise<void> {
     await db.delete(leads).where(eq(leads.id, id));
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return await db.select().from(leads);
   }
 
   // Campaigns
