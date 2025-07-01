@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Sparkles, Zap, Users, BarChart3 } from "lucide-react";
-import logoPath from "@assets/4B2318DA-9B89-4D42-93A3-2FBF10335F25_1751404207122.png";
+import Logo from "@/components/logo";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -42,16 +42,8 @@ export default function AuthPage() {
         <div className="w-full max-w-md space-y-6">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-3 mb-4">
-              <img 
-                src={logoPath} 
-                alt="DNXT.ai Logo" 
-                className="w-16 h-16 object-contain"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-gradient-nxt">DNXT.ai</h1>
-                <p className="text-sm text-muted-foreground">Plataforma SaaS Completa</p>
-              </div>
+            <div className="inline-flex justify-center mb-4">
+              <Logo size="lg" />
             </div>
           </div>
 
@@ -66,7 +58,7 @@ export default function AuthPage() {
                 <CardHeader>
                   <CardTitle>Faça seu login</CardTitle>
                   <CardDescription>
-                    Entre na sua conta para acessar a plataforma
+                    Acesse sua conta DNXT.ai
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -78,7 +70,9 @@ export default function AuthPage() {
                         type="email"
                         placeholder="seu@email.com"
                         value={loginForm.email}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setLoginForm({ ...loginForm, email: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -87,26 +81,25 @@ export default function AuthPage() {
                       <Input
                         id="password"
                         type="password"
-                        placeholder="Sua senha"
+                        placeholder="••••••••"
                         value={loginForm.password}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                        onChange={(e) =>
+                          setLoginForm({ ...loginForm, password: e.target.value })
+                        }
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                      {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Entrar
                     </Button>
                   </form>
-
-                  <div className="mt-4 p-3 bg-muted rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-2">Contas de demonstração:</p>
-                    <div className="text-xs space-y-1">
-                      <p><strong>samuel@dnxtai.com</strong> (Admin)</p>
-                      <p><strong>leo@dnxtai.com</strong> (Admin)</p>
-                      <p className="text-muted-foreground">Senha: admin123</p>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -114,9 +107,9 @@ export default function AuthPage() {
             <TabsContent value="register">
               <Card>
                 <CardHeader>
-                  <CardTitle>Criar conta</CardTitle>
+                  <CardTitle>Crie sua conta</CardTitle>
                   <CardDescription>
-                    Crie sua conta para começar a usar a NXT.ai
+                    Comece a usar DNXT.ai gratuitamente
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -126,9 +119,11 @@ export default function AuthPage() {
                         <Label htmlFor="firstName">Nome</Label>
                         <Input
                           id="firstName"
-                          placeholder="Seu nome"
+                          placeholder="João"
                           value={registerForm.firstName}
-                          onChange={(e) => setRegisterForm(prev => ({ ...prev, firstName: e.target.value }))}
+                          onChange={(e) =>
+                            setRegisterForm({ ...registerForm, firstName: e.target.value })
+                          }
                           required
                         />
                       </div>
@@ -136,9 +131,11 @@ export default function AuthPage() {
                         <Label htmlFor="lastName">Sobrenome</Label>
                         <Input
                           id="lastName"
-                          placeholder="Seu sobrenome"
+                          placeholder="Silva"
                           value={registerForm.lastName}
-                          onChange={(e) => setRegisterForm(prev => ({ ...prev, lastName: e.target.value }))}
+                          onChange={(e) =>
+                            setRegisterForm({ ...registerForm, lastName: e.target.value })
+                          }
                           required
                         />
                       </div>
@@ -150,7 +147,21 @@ export default function AuthPage() {
                         type="email"
                         placeholder="seu@email.com"
                         value={registerForm.email}
-                        onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setRegisterForm({ ...registerForm, email: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tenantName">Nome da Empresa</Label>
+                      <Input
+                        id="tenantName"
+                        placeholder="Minha Empresa"
+                        value={registerForm.tenantName}
+                        onChange={(e) =>
+                          setRegisterForm({ ...registerForm, tenantName: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -159,27 +170,23 @@ export default function AuthPage() {
                       <Input
                         id="registerPassword"
                         type="password"
-                        placeholder="Sua senha"
+                        placeholder="••••••••"
                         value={registerForm.password}
-                        onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
+                        onChange={(e) =>
+                          setRegisterForm({ ...registerForm, password: e.target.value })
+                        }
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tenantName">Nome da Empresa (opcional)</Label>
-                      <Input
-                        id="tenantName"
-                        placeholder="Sua empresa"
-                        value={registerForm.tenantName}
-                        onChange={(e) => setRegisterForm(prev => ({ ...prev, tenantName: e.target.value }))}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Deixe em branco para usar a conta de demonstração
-                      </p>
-                    </div>
-                    <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-                      {registerMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Criar Conta
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Cadastrar
                     </Button>
                   </form>
                 </CardContent>

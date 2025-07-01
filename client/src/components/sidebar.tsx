@@ -14,7 +14,7 @@ import {
   BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoPath from "@assets/4B2318DA-9B89-4D42-93A3-2FBF10335F25_1751404207122.png";
+import Logo from "@/components/logo";
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -39,16 +39,8 @@ export default function Sidebar() {
     <aside className="w-64 bg-sidebar-background border-r border-sidebar-border flex-shrink-0">
       <div className="p-6">
         {/* Logo */}
-        <div className="flex items-center space-x-3 mb-8">
-          <img 
-            src={logoPath} 
-            alt="DNXT.ai Logo" 
-            className="w-12 h-12 object-contain"
-          />
-          <div>
-            <h1 className="text-xl font-bold text-gradient-nxt">DNXT.ai</h1>
-            <p className="text-xs text-muted-foreground">Plataforma SaaS</p>
-          </div>
+        <div className="mb-8">
+          <Logo size="md" />
         </div>
 
         {/* Navigation */}
