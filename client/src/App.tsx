@@ -4,7 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { Loader2 } from "lucide-react";
+import { Redirect } from "wouter";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
@@ -17,24 +19,52 @@ import ApiDocs from "@/pages/api-docs";
 import Team from "@/pages/team";
 import Settings from "@/pages/settings";
 import Onboarding from "@/pages/onboarding";
-import { ProtectedRoute } from "./lib/protected-route";
 import Layout from "@/components/layout";
+
+function ProtectedWrapper({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Redirect to="/auth" />;
+  }
+
+  return <>{children}</>;
+}
 
 function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/" component={() => <Layout><Dashboard /></Layout>} />
-      <ProtectedRoute path="/crm" component={() => <Layout><CRM /></Layout>} />
-      <ProtectedRoute path="/campaigns" component={() => <Layout><Campaigns /></Layout>} />
-      <ProtectedRoute path="/chatbot" component={() => <Layout><Chatbot /></Layout>} />
-      <ProtectedRoute path="/integrations" component={() => <Layout><Integrations /></Layout>} />
-      <ProtectedRoute path="/automations" component={() => <Layout><Automations /></Layout>} />
-      <ProtectedRoute path="/api" component={() => <Layout><ApiDocs /></Layout>} />
-      <ProtectedRoute path="/team" component={() => <Layout><Team /></Layout>} />
-      <ProtectedRoute path="/settings" component={() => <Layout><Settings /></Layout>} />
-      <ProtectedRoute path="/onboarding" component={() => <Layout><Onboarding /></Layout>} />
-      <Route component={NotFound} />
+      <Route>
+        <ProtectedWrapper>
+          <Layout>
+            <Switch>
+              <Route path="/" component={Dashboard} />
+              <Route path="/crm" component={CRM} />
+              <Route path="/campaigns" component={Campaigns} />
+              <Route path="/chatbot" component={Chatbot} />
+              <Route path="/integrations" component={Integrations} />
+              <Route path="/automations" component={Automations} />
+              <Route path="/api" component={ApiDocs} />
+              <Route path="/team" component={Team} />
+              <Route path="/settings" component={Settings} />
+              <Route path="/onboarding" component={Onboarding} />
+              <Route component={NotFound} />
+            </Switch>
+          </Layout>
+        </ProtectedWrapper>
+      </Route>
     </Switch>
   );
 }
