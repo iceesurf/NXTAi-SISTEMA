@@ -46,7 +46,7 @@ export default function AuthPage() {
                 <span className="text-white font-bold text-xl">N</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gradient-nxt">NXT.ai</h1>
+                <h1 className="text-2xl font-bold text-gradient-nxt">DNXT.ai</h1>
                 <p className="text-sm text-muted-foreground">Plataforma SaaS Completa</p>
               </div>
             </div>

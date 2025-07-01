@@ -472,9 +472,9 @@ export default function Integrations() {
                 <Database className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">API da NXT.ai</h3>
+                <h3 className="text-lg font-semibold mb-2">API da DNXT.ai</h3>
                 <p className="text-muted-foreground mb-4">
-                  Use nossa API REST para integrar a NXT.ai com qualquer aplicação. Acesse dados de leads, 
+                  Use nossa API REST para integrar a DNXT.ai com qualquer aplicação. Acesse dados de leads, 
                   campanhas e automações programaticamente.
                 </p>
                 <Button variant="outline">

@@ -51,13 +51,29 @@ export function setupAuth(app: Express) {
       { usernameField: "email" },
       async (email, password, done) => {
         try {
+          console.log("🔍 Buscando usuário:", email);
           const user = await storage.getUserByEmail(email);
-          if (!user || !(await comparePasswords(password, user.password))) {
+          
+          if (!user) {
+            console.log("❌ Usuário não encontrado:", email);
             return done(null, false);
-          } else {
-            return done(null, user);
           }
+          
+          console.log("✅ Usuário encontrado:", user.email);
+          console.log("🔑 Verificando senha...");
+          
+          const passwordMatch = await comparePasswords(password, user.password);
+          console.log("🔑 Senha válida:", passwordMatch);
+          
+          if (!passwordMatch) {
+            console.log("❌ Senha incorreta para:", email);
+            return done(null, false);
+          }
+          
+          console.log("✅ Autenticação bem-sucedida para:", email);
+          return done(null, user);
         } catch (error) {
+          console.error("❌ Erro na estratégia de autenticação:", error);
           return done(error);
         }
       },
@@ -126,8 +142,30 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
+  app.post("/api/login", (req, res, next) => {
+    console.log("🔐 Tentativa de login:", req.body.email);
+    
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("❌ Erro na autenticação:", err);
+        return next(err);
+      }
+      
+      if (!user) {
+        console.log("❌ Login falhou para:", req.body.email);
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+      
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("❌ Erro ao fazer login:", loginErr);
+          return next(loginErr);
+        }
+        
+        console.log("✅ Login bem-sucedido:", user.email);
+        res.status(200).json(user);
+      });
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {

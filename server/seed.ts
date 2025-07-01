@@ -20,9 +20,9 @@ async function seedDatabase() {
     const [tenant] = await db
       .insert(tenants)
       .values({
-        name: "NXT.ai Demo",
-        slug: "nxt-ai-demo",
-        domain: "demo.nxt.ai",
+        name: "DNXT.ai",
+        slug: "dnxtai",
+        domain: "dnxtai.com",
         primaryColor: "#6E00FF",
         secondaryColor: "#FF2CB4",
         accentColor: "#00F5FF",
@@ -35,7 +35,7 @@ async function seedDatabase() {
       const [existingTenant] = await db
         .select()
         .from(tenants)
-        .where(eq(tenants.slug, "nxt-ai-demo"))
+        .where(eq(tenants.slug, "dnxtai"))
         .limit(1);
       
       if (existingTenant) {

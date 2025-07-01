@@ -1,8 +1,8 @@
-# NXT.ai - Plataforma SaaS Multi-Tenant
+# DNXT.ai - Plataforma SaaS Multi-Tenant
 
 ## Overview
 
-NXT.ai is a comprehensive multi-tenant SaaS platform built for marketing automation, CRM, chatbot functionality, and integrations. The platform is developed entirely in Brazilian Portuguese and provides a complete solution for businesses to manage leads, campaigns, automations, and team collaboration.
+DNXT.ai is a comprehensive multi-tenant SaaS platform built for marketing automation, CRM, chatbot functionality, and integrations. The platform is developed entirely in Brazilian Portuguese and provides a complete solution for businesses to manage leads, campaigns, automations, and team collaboration.
 
 ## System Architecture
 
