@@ -1,0 +1,63 @@
+Perfeito, Samuel! Vou resumir todas as integrações que o sistema NXT.ai terá, alinhado com as funcionalidades que você listou, e que farei no pacote completo, pronto para rodar no Replit com tema dark roxo neon.
+
+⸻
+
+1. Funcionalidades Principais (confirmadas)
+	•	Multi-tenant 100% (cada empresa isolada, usuários e dados)
+	•	CRM completo (leads, clientes, histórico, filtros, importação CSV)
+	•	Campanhas (envio por e-mail, WhatsApp, Slack, etc.)
+	•	Chatbot com IA (OpenAI + treinável + multicanal)
+	•	Painel de Integrações (configuração fácil e visível)
+	•	Workflows / Automações (gatilhos + ações configuráveis)
+	•	Whitelabel (cores, logo, domínio personalizado)
+	•	API pública com autenticação, documentação e rate limit
+	•	Segurança robusta e permissões por perfil (Admin, Usuário, Colaborador)
+	•	Dashboard com gráficos interativos e exportação CSV/XLSX
+	•	Modo escuro/claro com tema roxo neon
+	•	Onboarding e ajuda interativa para novos usuários
+
+⸻
+
+2. Integrações Que O Sistema Terá (implementação base + painel)
+
+Pagamentos
+	•	ASAAS (API + webhook + painel config)
+
+Comunicação
+	•	WhatsApp API (conexão para envio e recebimento de mensagens)
+	•	Slack (envio de alertas, notificações, integração com workflows)
+	•	Google Calendar (sincronização e lembretes)
+	•	SMTP / Sendgrid (envio de e-mails em massa e personalizados)
+
+Marketing & Automação
+	•	RD Station (captura e envio de leads)
+	•	Zapier (automatização com milhares de apps externos)
+	•	Webhooks personalizáveis (para integrar qualquer sistema via HTTP)
+
+API & Plataforma
+	•	API Pública (para acesso programático via chaves por tenant, documentação interna)
+
+⸻
+
+3. O que vai estar pronto no pacote inicial
+	•	Backend com endpoints para salvar/chave API de cada integração (painel vai mostrar esses campos)
+	•	Frontend com painel visual que mostra cada integração, permite colar as chaves e clicar em “Conectar” (botão ativo, mas algumas integrações podem estar em modo mock/incompleto, para depois ativar na produção)
+	•	Exemplo básico de webhook configurado para ASAAS para notificações de pagamento
+	•	Estrutura pronta para autenticar chamadas da API pública via chave
+	•	Segurança com controle de permissões multi-tenant
+	•	Tema dark roxo neon aplicado em todas telas principais
+	•	Dashboard, CRM, Campanhas, Chatbot, Workflows, Whitelabel e Onboarding com UI base
+	•	Documentação no README com como inserir as chaves e configurar cada integração
+
+⸻
+
+4. Próximos passos para o pacote
+	•	Gerar o ZIP completo com tudo isso acima, para rodar no Replit Free
+	•	Instruções detalhadas no README para configurar .env e deploy no Render
+	•	Seed com usuários admin (samuel@dnxtai.com e leo@dnxtai.com)
+	•	Index.js para rodar backend+frontend juntos no Replit
+	•	Logotipo e identidade visual nas 3 cores roxo/rosa/azul neon
+
+⸻
+
+Me confirma se está tudo OK para eu gerar tudo isso agora, assim já te entrego o pacote prontinho para você colar no Replit, fazer deploy e testar TODAS essas funcionalidades básicas já integradas?

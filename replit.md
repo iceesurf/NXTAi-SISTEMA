@@ -104,6 +104,20 @@ The application implements a multi-tenant architecture where:
 
 Changelog:
 - July 01, 2025. Initial setup
+- July 01, 2025. Sistema completo DNXT.ai finalizado com:
+  - Multi-tenant architecture com separação completa de dados
+  - Autenticação funcional (samuel@dnxtai.com / admin123)
+  - CRM completo com gestão de leads
+  - Sistema de campanhas (email/WhatsApp)
+  - Chatbot com interface IA
+  - Painel de integrações (ASAAS, WhatsApp, Slack, etc.)
+  - Sistema de automações/workflows
+  - API pública com documentação
+  - Gestão de equipe e permissões
+  - Configurações whitelabel
+  - Onboarding interativo
+  - Tema roxo neon responsivo
+  - Configurado para domínio dnxtai.com
 
 ## User Preferences
 

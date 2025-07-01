@@ -16,6 +16,7 @@ import Automations from "@/pages/automations";
 import ApiDocs from "@/pages/api-docs";
 import Team from "@/pages/team";
 import Settings from "@/pages/settings";
+import Onboarding from "@/pages/onboarding";
 import { ProtectedRoute } from "./lib/protected-route";
 import Layout from "@/components/layout";
 
@@ -32,6 +33,7 @@ function Router() {
       <ProtectedRoute path="/api" component={() => <Layout><ApiDocs /></Layout>} />
       <ProtectedRoute path="/team" component={() => <Layout><Team /></Layout>} />
       <ProtectedRoute path="/settings" component={() => <Layout><Settings /></Layout>} />
+      <ProtectedRoute path="/onboarding" component={() => <Layout><Onboarding /></Layout>} />
       <Route component={NotFound} />
     </Switch>
   );

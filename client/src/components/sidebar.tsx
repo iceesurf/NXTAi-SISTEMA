@@ -10,12 +10,14 @@ import {
   Zap, 
   Code, 
   Settings, 
-  LogOut 
+  LogOut,
+  BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: Home },
+  { href: "/onboarding", label: "Primeiros Passos", icon: BookOpen },
   { href: "/crm", label: "CRM & Leads", icon: Users },
   { href: "/campaigns", label: "Campanhas", icon: Mail },
   { href: "/chatbot", label: "Chatbot", icon: MessageCircle },
@@ -38,10 +40,10 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="flex items-center space-x-3 mb-8">
           <div className="w-10 h-10 rounded-xl gradient-nxt flex items-center justify-center">
-            <span className="text-white font-bold text-lg">N</span>
+            <span className="text-white font-bold text-lg">D</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gradient-nxt">NXT.ai</h1>
+            <h1 className="text-xl font-bold text-gradient-nxt">DNXT.ai</h1>
             <p className="text-xs text-muted-foreground">Plataforma SaaS</p>
           </div>
         </div>
