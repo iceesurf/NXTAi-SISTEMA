@@ -1,0 +1,182 @@
+Perfeito, Samuel! Aqui está o roteiro completo e técnico do que será feito — como se fosse um documento plano-de-execução.txt, com toda a estrutura da plataforma NXT.ai, organizada e detalhada linha por linha, sem faltar nada.
+
+⸻
+
+📄 Plano de Execução – Plataforma SaaS NXT.ai (Replit + GitHub + Render)
+
+🟣 Objetivo:
+Criar e entregar uma plataforma SaaS multi-tenant chamada NXT.ai, com estrutura profissional para rodar gratuitamente no Replit, ser exportada para GitHub, e subida com domínio próprio no Render (dnxtai.com).
+
+⸻
+
+📁 Estrutura Final do Projeto
+
+/nxt-ai
+│
+├── client/                   # Frontend React 19 + Vite + Tailwind
+│   ├── src/
+│   │   ├── assets/           # Imagens, logos (versões roxa, rosa, azul)
+│   │   ├── components/       # Componentes reutilizáveis
+│   │   ├── pages/            # Páginas (Login, Dashboard, CRM, etc.)
+│   │   ├── integrations/     # Tela com todos os blocos de integrações
+│   │   └── App.jsx
+│   ├── public/
+│   ├── index.html
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   └── package.json
+│
+├── server/                   # Backend Node.js + Express + Drizzle ORM
+│   ├── controllers/          # Lógicas dos módulos (auth, crm, etc)
+│   ├── routes/               # Rotas RESTful separadas por módulo
+│   ├── db/
+│   │   ├── schema.js         # Esquema com Drizzle (multi-tenant)
+│   │   └── seed.js           # Criação dos usuários admin (Samuel & Leo)
+│   ├── middlewares/         # JWT, permissões, erros
+│   ├── services/            # Regras de negócio e integrações
+│   ├── index.js             # Ponto de entrada (express + serve frontend)
+│   ├── drizzle.config.js
+│   └── package.json
+│
+├── shared/                  # Tipagens e helpers comuns front/back
+│   ├── types/
+│   └── utils/
+│
+├── .env.example             # Exemplo completo de variáveis de ambiente
+├── index.js                 # Arquivo principal para rodar tudo no Replit
+├── README.md                # Instruções detalhadas de uso, setup e deploy
+└── nxt-ai-logo/             # Logos oficiais nas cores definidas
+
+
+⸻
+
+🎯 Funcionalidades Incluídas (e visíveis no frontend)
+
+🔐 Autenticação Multi-Tenant
+	•	Cadastro, login, logout
+	•	Tokens JWT
+	•	Separação de dados por empresa
+	•	Perfis: Admin, Usuário, Colaborador
+
+👥 Gestão de Usuários
+	•	Lista, convite, remoção
+	•	Papéis e permissões por tenant
+
+📊 Dashboard
+	•	Gráficos com leads, campanhas, receita
+	•	Exportação para CSV/XLSX
+	•	Filtros de data
+
+📋 CRM (Leads)
+	•	Cadastro, edição, importação CSV
+	•	Histórico, comentários e tags
+	•	Atribuição a membros
+
+✉️ Campanhas de Marketing
+	•	Criação de campanhas por canal (e-mail, WhatsApp)
+	•	Editor de mensagens
+	•	Envio manual ou automatizado
+	•	Relatórios de envio
+
+🤖 Chatbot
+	•	Tela de chat (com IA ou fluxos configuráveis)
+	•	Pronto para integração com OpenAI/Dialogflow
+	•	Multicanal (WhatsApp, site, etc.)
+
+🔌 Painel de Integrações (100% Visível)
+
+Cada integração aparece no frontend com:
+	•	Nome
+	•	Ícone
+	•	Campo para chave/token
+	•	Botão “Conectar” (ainda que desativado)
+
+Integrações incluídas:
+	•	ASAAS (pagamentos)
+	•	WhatsApp API
+	•	Slack
+	•	Google Calendar
+	•	SMTP / Sendgrid
+	•	RD Station
+	•	Zapier
+	•	Webhooks personalizados
+	•	API pública (geração de chave)
+
+🔄 Automações (Workflows)
+	•	Tela visual: criar regras do tipo:
+	•	“Se lead responder → enviar Slack”
+	•	“Se campanha enviada → mudar status”
+	•	Gatilhos, condições e ações
+
+🧩 API Pública
+	•	Documentada no frontend
+	•	Autenticada por chave única por tenant
+	•	Suporte a CORS
+
+🛡️ Segurança
+	•	Logs de acesso por usuário
+	•	Controle de ações por tenant/role
+	•	Senhas hash + JWT
+
+⚙️ Whitelabel
+	•	Painel de configurações:
+	•	Logo
+	•	Cores primárias
+	•	Domínio personalizado (aplicável no Render)
+
+⸻
+
+🌐 Idioma e Visual
+	•	Idioma: Português (Brasil) 100%
+	•	Cores padrão:
+	•	Roxo: #6E00FF
+	•	Rosa: #FF2CB4
+	•	Azul neon: #00F5FF
+	•	Layout responsivo, moderno, com suporte a tema escuro/claro
+
+⸻
+
+⚙️ .env.example (modelo)
+
+PORT=3000
+DATABASE_URL=postgresql://usuario:senha@host:porta/banco
+JWT_SECRET=sua-chave-jwt
+ASAAS_API_KEY=sua-chave-asaas
+SENDGRID_API_KEY=sua-chave-sendgrid
+SMTP_HOST=smtp.seudominio.com
+SMTP_PORT=587
+SMTP_USER=usuario@seudominio.com
+SMTP_PASS=senha
+OPENAI_API_KEY=sua-chave-openai
+
+
+⸻
+
+👥 Usuários Padrão Criados (seed inicial)
+
+1. samuel@dnxtai.com – Admin geral
+2. leo@dnxtai.com – Admin geral
+
+Senha padrão (definida no .env): admin123 (pode mudar depois)
+
+⸻
+
+🔁 Compatibilidade e Fluxo
+
+✅ Rodável 100% no Replit Free
+✅ Exportável para o GitHub com um clique
+✅ Pronto para deploy no Render, com domínio dnxtai.com
+✅ Totalmente modular e expansível
+
+⸻
+
+Se estiver tudo OK com esse plano, me confirma que sigo gerando:
+
+✅ O ZIP com essa estrutura
+✅ O README.md completo
+✅ O index.js pronto pra rodar tudo no Replit
+✅ Logos em 3 versões (roxo, rosa, azul neon)
+
+Assim você terá tudo funcionando sem precisar ajustar nada depois.
+
+Confirma que posso seguir com a geração final do pacote? 💾🛠️
