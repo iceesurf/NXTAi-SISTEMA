@@ -42,7 +42,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="dnxt-ai-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="nxt-ai-theme">
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
