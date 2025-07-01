@@ -3,81 +3,52 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
+  /* Dark theme with neon purples as default */
+  --background: hsl(240, 10%, 8%);
+  --foreground: hsl(0, 0%, 95%);
+  --muted: hsl(240, 10%, 15%);
+  --muted-foreground: hsl(240, 5%, 65%);
+  --popover: hsl(240, 10%, 12%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(240, 10%, 12%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(240, 10%, 20%);
+  --input: hsl(240, 10%, 18%);
   --primary: hsl(276, 100%, 50%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --secondary: hsl(240, 10%, 18%);
+  --secondary-foreground: hsl(0, 0%, 90%);
+  --accent: hsl(260, 100%, 65%);
+  --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(276, 100%, 50%);
   --radius: 0.5rem;
   
-  /* NXT.ai Colors */
-  --nxt-purple: hsl(276, 100%, 50%);
-  --nxt-pink: hsl(318, 100%, 58%);
-  --nxt-blue: hsl(190, 100%, 50%);
+  /* DNXT.ai Neon Purple Colors */
+  --nxt-purple: hsl(276, 100%, 50%);    /* #6E00FF */
+  --nxt-purple-light: hsl(260, 100%, 65%); /* #9A4DFF */
+  --nxt-purple-dark: hsl(275, 100%, 25%);  /* #4B0082 */
   
   /* Chart colors */
   --chart-1: hsl(276, 100%, 50%);
-  --chart-2: hsl(318, 100%, 58%);
-  --chart-3: hsl(190, 100%, 50%);
-  --chart-4: hsl(142, 76%, 36%);
-  --chart-5: hsl(31, 81%, 50%);
+  --chart-2: hsl(260, 100%, 65%);
+  --chart-3: hsl(275, 100%, 25%);
+  --chart-4: hsl(318, 100%, 58%);
+  --chart-5: hsl(190, 100%, 50%);
 
-  /* Sidebar colors */
-  --sidebar-background: hsl(0, 0%, 100%);
-  --sidebar-foreground: hsl(240, 5.3%, 26.1%);
+  /* Sidebar colors - dark theme */
+  --sidebar-background: hsl(240, 10%, 10%);
+  --sidebar-foreground: hsl(0, 0%, 90%);
   --sidebar-primary: hsl(276, 100%, 50%);
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(240, 4.8%, 95.9%);
-  --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
-  --sidebar-border: hsl(240, 5.9%, 90%);
+  --sidebar-accent: hsl(240, 10%, 18%);
+  --sidebar-accent-foreground: hsl(0, 0%, 90%);
+  --sidebar-border: hsl(240, 10%, 20%);
   --sidebar-ring: hsl(276, 100%, 50%);
 }
 
-.dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 3.7%, 15.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(276, 100%, 50%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(276, 100%, 50%);
-
-  /* Sidebar dark colors */
-  --sidebar-background: hsl(240, 5.9%, 10%);
-  --sidebar-foreground: hsl(240, 4.8%, 95.9%);
-  --sidebar-primary: hsl(276, 100%, 50%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(240, 3.7%, 15.9%);
-  --sidebar-accent-foreground: hsl(240, 4.8%, 95.9%);
-  --sidebar-border: hsl(240, 3.7%, 15.9%);
-  --sidebar-ring: hsl(276, 100%, 50%);
-}
+/* Dark theme is now the default in :root */
 
 @layer base {
   * {
@@ -92,11 +63,11 @@
 
 @layer utilities {
   .gradient-nxt {
-    background: linear-gradient(135deg, #6E00FF 0%, #FF2CB4 50%, #00F5FF 100%);
+    background: linear-gradient(135deg, #6E00FF 0%, #9A4DFF 50%, #4B0082 100%);
   }
   
   .text-gradient-nxt {
-    background: linear-gradient(135deg, #6E00FF 0%, #FF2CB4 50%, #00F5FF 100%);
+    background: linear-gradient(135deg, #6E00FF 0%, #9A4DFF 50%, #4B0082 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -106,6 +77,18 @@
     background-size: 400% 400%;
     animation: gradient 6s ease infinite;
   }
+  
+  .gradient-nxt-bright {
+    background: linear-gradient(135deg, #9A4DFF 0%, #6E00FF 50%, #9A4DFF 100%);
+  }
+  
+  .bg-nxt-purple { background-color: #6E00FF; }
+  .bg-nxt-purple-light { background-color: #9A4DFF; }
+  .bg-nxt-purple-dark { background-color: #4B0082; }
+  
+  .text-nxt-purple { color: #6E00FF; }
+  .text-nxt-purple-light { color: #9A4DFF; }
+  .text-nxt-purple-dark { color: #4B0082; }
   
   @keyframes gradient {
     0%, 100% {
