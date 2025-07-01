@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export default function Header({ 
   title = "Dashboard", 
-  description = "Visão geral da sua plataforma NXT.ai" 
+  description = "Visão geral da sua plataforma DNXT.ai" 
 }: HeaderProps) {
   const { theme, setTheme } = useTheme();
 

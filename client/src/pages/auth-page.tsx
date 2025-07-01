@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Sparkles, Zap, Users, BarChart3 } from "lucide-react";
+import logoPath from "@assets/4B2318DA-9B89-4D42-93A3-2FBF10335F25_1751404207122.png";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -42,9 +43,11 @@ export default function AuthPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 rounded-xl gradient-nxt flex items-center justify-center">
-                <span className="text-white font-bold text-xl">N</span>
-              </div>
+              <img 
+                src={logoPath} 
+                alt="DNXT.ai Logo" 
+                className="w-16 h-16 object-contain"
+              />
               <div>
                 <h1 className="text-2xl font-bold text-gradient-nxt">DNXT.ai</h1>
                 <p className="text-sm text-muted-foreground">Plataforma SaaS Completa</p>
