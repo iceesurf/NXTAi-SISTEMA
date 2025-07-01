@@ -16,9 +16,9 @@ import {
   Settings,
   ArrowRight,
   Sparkles,
-  Target
+  Target,
+  HelpCircle
 } from "lucide-react";
-import Layout from "@/components/layout";
 import Header from "@/components/header";
 
 interface OnboardingStep {
@@ -41,7 +41,7 @@ export default function Onboarding() {
       title: "Complete seu Perfil",
       description: "Configure informações da sua empresa e personalize a plataforma",
       icon: Settings,
-      completed: true,
+      completed: !!user?.email,
       href: "/settings",
       category: "essential"
     },
@@ -150,9 +150,9 @@ export default function Onboarding() {
   );
 
   return (
-    <Layout>
+    <>
       <Header 
-        title="Bem-vindo ao DNXT.ai!"
+        title="Bem-vindo ao NXT.ai!"
         description="Configure sua plataforma em alguns passos simples"
       />
       
@@ -248,37 +248,27 @@ export default function Onboarding() {
         <Card className="mt-8 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <MessageCircle className="w-5 h-5 text-primary" />
+              <HelpCircle className="w-5 h-5 text-primary" />
               <span>Precisa de Ajuda?</span>
             </CardTitle>
             <CardDescription>
-              Recursos para te ajudar a aproveitar ao máximo a plataforma
+              Nossa equipe está aqui para ajudar você a começar
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="h-auto p-4 text-left">
-                <div>
-                  <div className="font-medium">Documentação</div>
-                  <div className="text-sm text-muted-foreground">Guias completos</div>
-                </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button variant="outline" className="flex-1">
+                <Mail className="w-4 h-4 mr-2" />
+                Enviar E-mail
               </Button>
-              <Button variant="outline" className="h-auto p-4 text-left">
-                <div>
-                  <div className="font-medium">Vídeo Tutoriais</div>
-                  <div className="text-sm text-muted-foreground">Aprenda assistindo</div>
-                </div>
-              </Button>
-              <Button variant="outline" className="h-auto p-4 text-left">
-                <div>
-                  <div className="font-medium">Suporte</div>
-                  <div className="text-sm text-muted-foreground">Fale conosco</div>
-                </div>
+              <Button variant="outline" className="flex-1">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Chat ao Vivo
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
 }
