@@ -28,13 +28,13 @@ export default function Logo({
     <div className={cn("flex items-center space-x-3", className)}>
       <img 
         src={logoPath} 
-        alt="DNXT.ai Logo" 
+        alt="NXT.ai Logo" 
         className={cn("object-contain", sizeClasses[size])}
       />
       {showText && (
         <div>
           <h1 className={cn("font-bold text-gradient-nxt", textSizeClasses[size])}>
-            DNXT.ai
+            NXT.ai
           </h1>
           <p className="text-xs text-muted-foreground">Plataforma SaaS</p>
         </div>

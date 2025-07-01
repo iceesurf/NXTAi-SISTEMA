@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// DNXT.ai - Universal Entry Point
+// NXT.ai - Universal Entry Point
 // This file serves the application in production or development mode
 
 import { existsSync } from 'fs';
@@ -11,14 +11,14 @@ import { spawn } from 'child_process';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distExists = existsSync(join(__dirname, 'dist', 'index.js'));
 
-console.log('🚀 Starting DNXT.ai...');
+console.log('🚀 Starting NXT.ai...');
 console.log('📦 Production build available:', distExists);
 
 if (distExists && process.env.NODE_ENV === 'production') {
   // Production mode - use built files
   console.log('🎯 Running in production mode');
   import('./dist/index.js').then(() => {
-    console.log('✅ DNXT.ai production server started');
+    console.log('✅ NXT.ai production server started');
   }).catch((error) => {
     console.error('❌ Production server failed:', error);
     console.log('🔄 Falling back to development mode...');

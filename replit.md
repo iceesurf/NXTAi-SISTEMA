@@ -1,8 +1,8 @@
-# DNXT.ai - Plataforma SaaS Multi-Tenant
+# NXT.ai - Plataforma SaaS Multi-Tenant
 
 ## Overview
 
-DNXT.ai is a comprehensive multi-tenant SaaS platform built for marketing automation, CRM, chatbot functionality, and integrations. The platform is developed entirely in Brazilian Portuguese and provides a complete solution for businesses to manage leads, campaigns, automations, and team collaboration.
+NXT.ai is a comprehensive multi-tenant SaaS platform built for marketing automation, CRM, chatbot functionality, and integrations. The platform is developed entirely in Brazilian Portuguese and provides a complete solution for businesses to manage leads, campaigns, automations, and team collaboration.
 
 ## System Architecture
 
@@ -104,7 +104,7 @@ The application implements a multi-tenant architecture where:
 
 Changelog:
 - July 01, 2025. Initial setup
-- July 01, 2025. Sistema completo DNXT.ai finalizado com:
+- July 01, 2025. Sistema completo NXT.ai finalizado com:
   - Multi-tenant architecture com separação completa de dados
   - Autenticação funcional (samuel@dnxtai.com / admin123)
   - CRM completo com gestão de leads
@@ -117,11 +117,12 @@ Changelog:
   - Configurações whitelabel
   - Onboarding interativo
   - Tema escuro com roxos neon (#6E00FF, #9A4DFF, #4B0082)
-  - Logo DNXT.ai integrada com fundo escuro/transparente
-  - Configurado para domínio dnxtai.com
+  - Logo NXT.ai integrada com fundo escuro/transparente
+  - Configurado para domínio dnxtai.com (projeto NXT.ai)
   - Componente Logo reutilizável criado
   - Sistema otimizado para deploy no Replit
   - Entry point universal (index.js) configurado
+  - Todas as referências corrigidas para NXT.ai
   - Pronto para apontar domínio dnxtai.com
 
 ## User Preferences

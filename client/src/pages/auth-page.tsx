@@ -58,7 +58,7 @@ export default function AuthPage() {
                 <CardHeader>
                   <CardTitle>Faça seu login</CardTitle>
                   <CardDescription>
-                    Acesse sua conta DNXT.ai
+                    Acesse sua conta NXT.ai
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -109,7 +109,7 @@ export default function AuthPage() {
                 <CardHeader>
                   <CardTitle>Crie sua conta</CardTitle>
                   <CardDescription>
-                    Comece a usar DNXT.ai gratuitamente
+                    Comece a usar NXT.ai gratuitamente
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
