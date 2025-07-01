@@ -116,8 +116,10 @@ Changelog:
   - Gestão de equipe e permissões
   - Configurações whitelabel
   - Onboarding interativo
-  - Tema roxo neon responsivo
+  - Tema escuro com roxos neon (#6E00FF, #9A4DFF, #4B0082)
   - Configurado para domínio dnxtai.com
+  - Build de produção criado com sucesso
+  - Sistema pronto para deploy no Replit
 
 ## User Preferences
 
