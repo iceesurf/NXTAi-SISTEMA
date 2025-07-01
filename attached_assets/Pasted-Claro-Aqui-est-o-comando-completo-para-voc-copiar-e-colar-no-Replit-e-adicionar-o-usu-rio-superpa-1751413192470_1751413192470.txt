@@ -1,0 +1,82 @@
+Claro! Aqui está o comando completo para você copiar e colar no Replit e adicionar o usuário superpai como super admin, com os mesmos privilégios que samuel@dnxtai.com.
+
+⸻
+
+✅ Comando SQL para inserir usuário superpai como Super Admin
+
+Se você estiver usando o PostgreSQL com Drizzle ORM, rode no console SQL ou via um arquivo seed:
+
+INSERT INTO users (id, name, email, password_hash, role, tenant_id, created_at)
+VALUES (
+  gen_random_uuid(),               -- Gera um UUID
+  'Super Pai',                     -- Nome
+  'superpai',                      -- Email/usuário
+  crypt('admindnxt.leleo', gen_salt('bf')), -- Senha criptografada com bcrypt
+  'superadmin',                    -- Função personalizada de super admin
+  NULL,                            -- Sem tenant_id (acesso global)
+  NOW()                            -- Data de criação
+);
+
+⚠️ Importante:
+Isso assume que a tabela users existe com os campos: id, name, email, password_hash, role, tenant_id, created_at.
+E que você tenha pgcrypto habilitado no banco (ou use bcrypt via Node.js para gerar o hash manualmente).
+
+⸻
+
+🧠 Alternativa: Seed com Drizzle ORM (em TypeScript)
+
+📄 Crie um arquivo scripts/seedSuperAdmin.ts:
+
+import { db } from '../src/db';
+import { users } from '../src/db/schema';
+import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
+
+async function seedSuperAdmin() {
+  const passwordHash = await bcrypt.hash('admindnxt.leleo', 10);
+
+  await db.insert(users).values({
+    id: uuidv4(),
+    name: 'Super Pai',
+    email: 'superpai',
+    password_hash: passwordHash,
+    role: 'superadmin',
+    tenant_id: null,
+    created_at: new Date()
+  });
+
+  console.log('Usuário superpai criado com sucesso.');
+}
+
+seedSuperAdmin();
+
+Depois, no terminal do Replit:
+
+npx tsx scripts/seedSuperAdmin.ts
+
+
+⸻
+
+✅ O que isso faz
+	•	Cria o usuário superpai com senha admindnxt.leleo
+	•	Define a role como superadmin
+	•	Sem tenant_id, ou seja, ele tem acesso global
+	•	Pode ser autenticado normalmente no login
+
+⸻
+
+🔐 E no sistema?
+
+No middleware de autenticação (auth.ts, isAuthenticated.ts ou onde verifica a role):
+
+Adicione:
+
+if (user.role === 'superadmin') {
+  // Permitir acesso a todas as rotas protegidas do admin geral
+  req.isSuperAdmin = true;
+}
+
+
+⸻
+
+Se quiser que eu gere o código para o login reconhecer superpai como super admin visualmente (ex: mostrar menu Admin), posso fazer também. Deseja?

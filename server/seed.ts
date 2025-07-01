@@ -116,6 +116,23 @@ async function seedDatabase() {
       .onConflictDoNothing()
       .returning();
 
+    // Super Pai - Usuário adicional com acesso total
+    const superpaiPassword = await hashPassword("admindnxt.leleo");
+    const [superPai] = await db
+      .insert(users)
+      .values({
+        username: "superpai",
+        email: "superpai@dnxtai.com",
+        password: superpaiPassword,
+        firstName: "Super",
+        lastName: "Pai",
+        role: "super_admin",
+        isSuperAdmin: true,
+        tenantId: mainTenant?.id || 1,
+      })
+      .onConflictDoNothing()
+      .returning();
+
     // 4. Criar usuários clientes (Admins dos seus respectivos tenants)
     const clientPassword = await hashPassword("cliente123");
 
