@@ -1,0 +1,286 @@
+import { 
+  users, 
+  tenants, 
+  leads, 
+  campaigns, 
+  conversations, 
+  integrations, 
+  automations, 
+  apiKeys,
+  type User, 
+  type InsertUser,
+  type Tenant,
+  type InsertTenant,
+  type Lead,
+  type InsertLead,
+  type Campaign,
+  type InsertCampaign,
+  type Conversation,
+  type InsertConversation,
+  type Integration,
+  type InsertIntegration,
+  type Automation,
+  type InsertAutomation,
+  type ApiKey,
+  type InsertApiKey
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
+
+const PostgresSessionStore = connectPg(session);
+
+export interface IStorage {
+  // Users
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  getUsersByTenant(tenantId: number): Promise<User[]>;
+  
+  // Tenants
+  getTenant(id: number): Promise<Tenant | undefined>;
+  getTenantBySlug(slug: string): Promise<Tenant | undefined>;
+  createTenant(tenant: InsertTenant): Promise<Tenant>;
+  updateTenant(id: number, tenant: Partial<InsertTenant>): Promise<Tenant>;
+  
+  // Leads
+  getLeadsByTenant(tenantId: number): Promise<Lead[]>;
+  createLead(lead: InsertLead): Promise<Lead>;
+  updateLead(id: number, lead: Partial<InsertLead>): Promise<Lead>;
+  deleteLead(id: number): Promise<void>;
+  
+  // Campaigns
+  getCampaignsByTenant(tenantId: number): Promise<Campaign[]>;
+  createCampaign(campaign: InsertCampaign): Promise<Campaign>;
+  updateCampaign(id: number, campaign: Partial<InsertCampaign>): Promise<Campaign>;
+  deleteCampaign(id: number): Promise<void>;
+  
+  // Conversations
+  getConversationsByTenant(tenantId: number): Promise<Conversation[]>;
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  updateConversation(id: number, conversation: Partial<InsertConversation>): Promise<Conversation>;
+  
+  // Integrations
+  getIntegrationsByTenant(tenantId: number): Promise<Integration[]>;
+  createIntegration(integration: InsertIntegration): Promise<Integration>;
+  updateIntegration(id: number, integration: Partial<InsertIntegration>): Promise<Integration>;
+  
+  // Automations
+  getAutomationsByTenant(tenantId: number): Promise<Automation[]>;
+  createAutomation(automation: InsertAutomation): Promise<Automation>;
+  updateAutomation(id: number, automation: Partial<InsertAutomation>): Promise<Automation>;
+  
+  // API Keys
+  getApiKeysByTenant(tenantId: number): Promise<ApiKey[]>;
+  createApiKey(apiKey: InsertApiKey): Promise<ApiKey>;
+  deleteApiKey(id: number): Promise<void>;
+  
+  sessionStore: session.SessionStore;
+}
+
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
+    });
+  }
+
+  // Users
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getUsersByTenant(tenantId: number): Promise<User[]> {
+    return await db.select().from(users).where(eq(users.tenantId, tenantId));
+  }
+
+  // Tenants
+  async getTenant(id: number): Promise<Tenant | undefined> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id));
+    return tenant || undefined;
+  }
+
+  async getTenantBySlug(slug: string): Promise<Tenant | undefined> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug));
+    return tenant || undefined;
+  }
+
+  async createTenant(insertTenant: InsertTenant): Promise<Tenant> {
+    const [tenant] = await db
+      .insert(tenants)
+      .values(insertTenant)
+      .returning();
+    return tenant;
+  }
+
+  async updateTenant(id: number, updateTenant: Partial<InsertTenant>): Promise<Tenant> {
+    const [tenant] = await db
+      .update(tenants)
+      .set({ ...updateTenant, updatedAt: new Date() })
+      .where(eq(tenants.id, id))
+      .returning();
+    return tenant;
+  }
+
+  // Leads
+  async getLeadsByTenant(tenantId: number): Promise<Lead[]> {
+    return await db.select().from(leads).where(eq(leads.tenantId, tenantId)).orderBy(desc(leads.createdAt));
+  }
+
+  async createLead(insertLead: InsertLead): Promise<Lead> {
+    const [lead] = await db
+      .insert(leads)
+      .values(insertLead)
+      .returning();
+    return lead;
+  }
+
+  async updateLead(id: number, updateLead: Partial<InsertLead>): Promise<Lead> {
+    const [lead] = await db
+      .update(leads)
+      .set({ ...updateLead, updatedAt: new Date() })
+      .where(eq(leads.id, id))
+      .returning();
+    return lead;
+  }
+
+  async deleteLead(id: number): Promise<void> {
+    await db.delete(leads).where(eq(leads.id, id));
+  }
+
+  // Campaigns
+  async getCampaignsByTenant(tenantId: number): Promise<Campaign[]> {
+    return await db.select().from(campaigns).where(eq(campaigns.tenantId, tenantId)).orderBy(desc(campaigns.createdAt));
+  }
+
+  async createCampaign(insertCampaign: InsertCampaign): Promise<Campaign> {
+    const [campaign] = await db
+      .insert(campaigns)
+      .values(insertCampaign)
+      .returning();
+    return campaign;
+  }
+
+  async updateCampaign(id: number, updateCampaign: Partial<InsertCampaign>): Promise<Campaign> {
+    const [campaign] = await db
+      .update(campaigns)
+      .set({ ...updateCampaign, updatedAt: new Date() })
+      .where(eq(campaigns.id, id))
+      .returning();
+    return campaign;
+  }
+
+  async deleteCampaign(id: number): Promise<void> {
+    await db.delete(campaigns).where(eq(campaigns.id, id));
+  }
+
+  // Conversations
+  async getConversationsByTenant(tenantId: number): Promise<Conversation[]> {
+    return await db.select().from(conversations).where(eq(conversations.tenantId, tenantId)).orderBy(desc(conversations.createdAt));
+  }
+
+  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+    const [conversation] = await db
+      .insert(conversations)
+      .values(insertConversation)
+      .returning();
+    return conversation;
+  }
+
+  async updateConversation(id: number, updateConversation: Partial<InsertConversation>): Promise<Conversation> {
+    const [conversation] = await db
+      .update(conversations)
+      .set({ ...updateConversation, updatedAt: new Date() })
+      .where(eq(conversations.id, id))
+      .returning();
+    return conversation;
+  }
+
+  // Integrations
+  async getIntegrationsByTenant(tenantId: number): Promise<Integration[]> {
+    return await db.select().from(integrations).where(eq(integrations.tenantId, tenantId));
+  }
+
+  async createIntegration(insertIntegration: InsertIntegration): Promise<Integration> {
+    const [integration] = await db
+      .insert(integrations)
+      .values(insertIntegration)
+      .returning();
+    return integration;
+  }
+
+  async updateIntegration(id: number, updateIntegration: Partial<InsertIntegration>): Promise<Integration> {
+    const [integration] = await db
+      .update(integrations)
+      .set({ ...updateIntegration, updatedAt: new Date() })
+      .where(eq(integrations.id, id))
+      .returning();
+    return integration;
+  }
+
+  // Automations
+  async getAutomationsByTenant(tenantId: number): Promise<Automation[]> {
+    return await db.select().from(automations).where(eq(automations.tenantId, tenantId)).orderBy(desc(automations.createdAt));
+  }
+
+  async createAutomation(insertAutomation: InsertAutomation): Promise<Automation> {
+    const [automation] = await db
+      .insert(automations)
+      .values(insertAutomation)
+      .returning();
+    return automation;
+  }
+
+  async updateAutomation(id: number, updateAutomation: Partial<InsertAutomation>): Promise<Automation> {
+    const [automation] = await db
+      .update(automations)
+      .set({ ...updateAutomation, updatedAt: new Date() })
+      .where(eq(automations.id, id))
+      .returning();
+    return automation;
+  }
+
+  // API Keys
+  async getApiKeysByTenant(tenantId: number): Promise<ApiKey[]> {
+    return await db.select().from(apiKeys).where(eq(apiKeys.tenantId, tenantId)).orderBy(desc(apiKeys.createdAt));
+  }
+
+  async createApiKey(insertApiKey: InsertApiKey): Promise<ApiKey> {
+    const [apiKey] = await db
+      .insert(apiKeys)
+      .values(insertApiKey)
+      .returning();
+    return apiKey;
+  }
+
+  async deleteApiKey(id: number): Promise<void> {
+    await db.delete(apiKeys).where(eq(apiKeys.id, id));
+  }
+}
+
+export const storage = new DatabaseStorage();
