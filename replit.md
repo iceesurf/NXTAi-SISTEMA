@@ -117,9 +117,12 @@ Changelog:
   - Configurações whitelabel
   - Onboarding interativo
   - Tema escuro com roxos neon (#6E00FF, #9A4DFF, #4B0082)
+  - Logo DNXT.ai integrada com fundo escuro/transparente
   - Configurado para domínio dnxtai.com
-  - Build de produção criado com sucesso
-  - Sistema pronto para deploy no Replit
+  - Componente Logo reutilizável criado
+  - Sistema otimizado para deploy no Replit
+  - Entry point universal (index.js) configurado
+  - Pronto para apontar domínio dnxtai.com
 
 ## User Preferences
 
