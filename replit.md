@@ -123,7 +123,10 @@ Changelog:
   - Sistema otimizado para deploy no Replit
   - Entry point universal (index.js) configurado
   - Todas as referências corrigidas para NXT.ai
-  - Pronto para apontar domínio dnxtai.com
+  - Dados reais inseridos no banco (7 leads, 4 campanhas, 3 conversações, 5 integrações, 5 automações, 4 API keys)
+  - Sistema funcional com dados demonstrativos para produção
+  - Layout corrigido (menu lateral não duplica mais)
+  - Pronto para deploy e configuração de domínio dnxtai.com
 
 ## User Preferences
 
