@@ -15,36 +15,12 @@ export function useEasterEggs() {
   
   const [easterEggs, setEasterEggs] = useState<EasterEgg[]>([
     {
-      id: "konami",
-      name: "Código Konami",
-      unlocked: false,
-      description: "Execute a sequência clássica: ↑↑↓↓←→←→BA",
-      trigger: "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightKeyBKeyA",
-      icon: "🕹️"
-    },
-    {
       id: "triple_click",
       name: "Triple Click Master",
       unlocked: false,
       description: "Clique 3 vezes rapidamente no logo da NXT.ai",
       trigger: "triple_click_logo",
       icon: "🖱️"
-    },
-    {
-      id: "coffee_time",
-      name: "Hora do Café",
-      unlocked: false,
-      description: "Digite 'coffee' em qualquer campo de busca",
-      trigger: "coffee_search",
-      icon: "☕"
-    },
-    {
-      id: "matrix_mode",
-      name: "Modo Matrix",
-      unlocked: false,
-      description: "Pressione Ctrl+Shift+M para ativar o modo Matrix",
-      trigger: "CtrlShiftKeyM",
-      icon: "🕶️"
     },
     {
       id: "dance_party",

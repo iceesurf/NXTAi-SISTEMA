@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode } from "react";
-import { useEasterEggs } from "@/hooks/use-easter-eggs";
+import { useEasterEggs } from "@/hooks/use-easter-eggs-simple";
 
 const EasterEggContext = createContext<ReturnType<typeof useEasterEggs> | null>(null);
 
