@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,6 +67,8 @@ export default function Chatbot() {
   const [messageInput, setMessageInput] = useState("");
   const [activeTab, setActiveTab] = useState("conversations");
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Estados para configuração de fluxos
   const [chatFlows, setChatFlows] = useState<ChatFlow[]>([
@@ -142,6 +144,11 @@ export default function Chatbot() {
     queryKey: ["/api/conversations"],
   });
 
+  // Scroll automático para o final do chat
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const mockConversations = [
     {
       id: "1",
@@ -162,7 +169,7 @@ export default function Chatbot() {
   ];
 
   const sendMessage = () => {
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim() || isTyping) return;
     
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -173,9 +180,11 @@ export default function Chatbot() {
     
     setMessages(prev => [...prev, userMessage]);
     setMessageInput("");
+    setIsTyping(true);
     
-    // Simular resposta do bot
+    // Simular resposta do bot com indicador de digitação
     setTimeout(() => {
+      setIsTyping(false);
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: "Obrigado pela sua mensagem! Um de nossos especialistas entrará em contato em breve.",
@@ -183,7 +192,7 @@ export default function Chatbot() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botResponse]);
-    }, 1000);
+    }, 2000);
   };
 
   // Funções para gerenciar fluxos do chatbot
@@ -440,50 +449,84 @@ export default function Chatbot() {
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="flex-1 flex flex-col">
-                    <ScrollArea className="flex-1 pr-4">
-                      <div className="space-y-4">
+                  <CardContent className="flex-1 flex flex-col p-4">
+                    <ScrollArea className="flex-1 h-64 mb-4">
+                      <div className="space-y-4 p-2">
                         {messages.map((message) => (
                           <div
                             key={message.id}
-                            className={`flex gap-3 ${
-                              message.sender === "user" ? "flex-row-reverse" : ""
+                            className={`flex items-start gap-2 ${
+                              message.sender === "user" ? "justify-end" : "justify-start"
                             }`}
                           >
-                            <Avatar className="w-8 h-8">
-                              <AvatarFallback>
-                                {message.sender === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                              </AvatarFallback>
-                            </Avatar>
+                            {message.sender === "bot" && (
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback>
+                                  <Bot className="w-4 h-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
                             <div
-                              className={`rounded-lg px-3 py-2 max-w-xs ${
+                              className={`rounded-lg px-3 py-2 max-w-[70%] break-words ${
                                 message.sender === "user"
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted"
+                                  ? "bg-primary text-primary-foreground ml-auto"
+                                  : "bg-muted text-foreground"
                               }`}
                             >
-                              <p className="text-sm">{message.content}</p>
-                              <span className="text-xs opacity-70">
+                              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                              <div className={`text-xs opacity-70 mt-1 ${
+                                message.sender === "user" ? "text-right" : "text-left"
+                              }`}>
                                 {message.timestamp.toLocaleTimeString('pt-BR', { 
                                   hour: '2-digit', 
                                   minute: '2-digit' 
                                 })}
-                              </span>
+                              </div>
                             </div>
+                            {message.sender === "user" && (
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback>
+                                  <User className="w-4 h-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
                           </div>
                         ))}
+                        {isTyping && (
+                          <div className="flex items-start gap-2 justify-start">
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              <AvatarFallback>
+                                <Bot className="w-4 h-4" />
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="bg-muted text-foreground rounded-lg px-3 py-2">
+                              <div className="flex gap-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <div ref={messagesEndRef} />
                       </div>
                     </ScrollArea>
                     
                     <div className="flex gap-2 pt-4 border-t">
                       <Input
-                        placeholder="Digite sua mensagem..."
+                        placeholder={isTyping ? "Bot está digitando..." : "Digite sua mensagem..."}
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                        disabled={isTyping}
                         className="flex-1"
                       />
-                      <Button onClick={sendMessage} size="sm">
+                      <Button 
+                        onClick={sendMessage} 
+                        size="sm" 
+                        disabled={isTyping || !messageInput.trim()}
+                        className="min-w-[44px]"
+                      >
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>
