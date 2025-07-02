@@ -1,12 +1,20 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import Header from "@/components/header";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   MessageCircle, 
   Send, 
@@ -16,7 +24,14 @@ import {
   BarChart3,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Edit,
+  Trash2,
+  Zap,
+  Brain,
+  Workflow,
+  Save
 } from "lucide-react";
 import type { Conversation } from "@shared/schema";
 
@@ -27,9 +42,81 @@ interface Message {
   timestamp: Date;
 }
 
+interface ChatFlow {
+  id: string;
+  name: string;
+  trigger: string;
+  responses: string[];
+  conditions: string[];
+  active: boolean;
+}
+
+interface AIConfig {
+  enabled: boolean;
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  systemPrompt: string;
+  fallbackMessage: string;
+}
+
 export default function Chatbot() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
+  const [activeTab, setActiveTab] = useState("conversations");
+  const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
+  
+  // Estados para configuração de fluxos
+  const [chatFlows, setChatFlows] = useState<ChatFlow[]>([
+    {
+      id: "welcome",
+      name: "Boas-vindas",
+      trigger: "iniciar conversa",
+      responses: [
+        "Olá! Bem-vindo ao atendimento da NXT.ai! 👋",
+        "Como posso ajudá-lo hoje?",
+        "Estou aqui para responder suas dúvidas sobre nossos produtos e serviços."
+      ],
+      conditions: ["primeira_mensagem"],
+      active: true
+    },
+    {
+      id: "products",
+      name: "Informações de Produtos",
+      trigger: "produtos|serviços|preços",
+      responses: [
+        "Temos uma linha completa de soluções para automação de marketing:",
+        "🔹 CRM completo com gestão de leads",
+        "🔹 Campanhas automatizadas de email e WhatsApp", 
+        "🔹 Chatbot inteligente",
+        "🔹 Integrações com principais plataformas",
+        "Gostaria de saber mais sobre algum produto específico?"
+      ],
+      conditions: ["contains_keyword"],
+      active: true
+    }
+  ]);
+
+  // Estados para configuração de IA
+  const [aiConfig, setAiConfig] = useState<AIConfig>({
+    enabled: true,
+    model: "gpt-4o",
+    temperature: 0.7,
+    maxTokens: 150,
+    systemPrompt: "Você é um assistente especializado em marketing digital e automação. Seja útil, profissional e direto nas respostas. Foque em soluções práticas para os clientes.",
+    fallbackMessage: "Desculpe, não entendi sua pergunta. Pode reformular ou falar com um de nossos especialistas?"
+  });
+
+  const [flowForm, setFlowForm] = useState({
+    name: "",
+    trigger: "",
+    responses: [""],
+    conditions: [""],
+    active: true
+  });
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -51,51 +138,43 @@ export default function Chatbot() {
     }
   ]);
 
-  const { data: conversations = [], isLoading } = useQuery<Conversation[]>({
+  const { data: conversations = [] } = useQuery<Conversation[]>({
     queryKey: ["/api/conversations"],
   });
 
   const mockConversations = [
     {
       id: "1",
-      customerName: "João Silva",
-      lastMessage: "Gostaria de saber mais sobre seus produtos",
-      timestamp: new Date(Date.now() - 1000 * 60 * 5),
+      leadName: "João Silva",
+      lastMessage: "Gostaria de saber mais sobre os preços",
       status: "active",
-      channel: "whatsapp"
+      channel: "whatsapp",
+      timestamp: new Date(Date.now() - 1000 * 60 * 5)
     },
     {
-      id: "2",
-      customerName: "Maria Santos",
-      lastMessage: "Qual é o preço do plano premium?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      status: "waiting",
-      channel: "website"
-    },
-    {
-      id: "3",
-      customerName: "Pedro Costa",
-      lastMessage: "Obrigado pela informação!",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60),
+      id: "2", 
+      leadName: "Maria Santos",
+      lastMessage: "Obrigada pelas informações!",
       status: "closed",
-      channel: "telegram"
+      channel: "website",
+      timestamp: new Date(Date.now() - 1000 * 60 * 30)
     }
   ];
 
-  const handleSendMessage = () => {
+  const sendMessage = () => {
     if (!messageInput.trim()) return;
-
-    const newMessage: Message = {
+    
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: messageInput,
       sender: "user",
       timestamp: new Date()
     };
-
-    setMessages(prev => [...prev, newMessage]);
+    
+    setMessages(prev => [...prev, userMessage]);
     setMessageInput("");
-
-    // Simulate bot response
+    
+    // Simular resposta do bot
     setTimeout(() => {
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -105,6 +184,91 @@ export default function Chatbot() {
       };
       setMessages(prev => [...prev, botResponse]);
     }, 1000);
+  };
+
+  // Funções para gerenciar fluxos do chatbot
+  const addChatFlow = () => {
+    if (!flowForm.name.trim() || !flowForm.trigger.trim()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Nome e gatilho são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newFlow: ChatFlow = {
+      id: `flow-${Date.now()}`,
+      name: flowForm.name,
+      trigger: flowForm.trigger,
+      responses: flowForm.responses.filter(r => r.trim()),
+      conditions: flowForm.conditions.filter(c => c.trim()),
+      active: flowForm.active
+    };
+
+    setChatFlows(prev => [...prev, newFlow]);
+    setFlowForm({
+      name: "",
+      trigger: "",
+      responses: [""],
+      conditions: [""],
+      active: true
+    });
+    setIsFlowDialogOpen(false);
+
+    toast({
+      title: "Fluxo criado!",
+      description: `Fluxo "${newFlow.name}" adicionado com sucesso.`,
+    });
+  };
+
+  const toggleFlowStatus = (flowId: string) => {
+    setChatFlows(prev => 
+      prev.map(flow => 
+        flow.id === flowId 
+          ? { ...flow, active: !flow.active }
+          : flow
+      )
+    );
+  };
+
+  const deleteFlow = (flowId: string) => {
+    setChatFlows(prev => prev.filter(flow => flow.id !== flowId));
+    toast({
+      title: "Fluxo removido",
+      description: "Fluxo excluído com sucesso.",
+    });
+  };
+
+  const saveAIConfig = () => {
+    // Aqui salvaria no backend
+    toast({
+      title: "Configuração salva!",
+      description: "Configurações de IA atualizadas com sucesso.",
+    });
+  };
+
+  const addResponseField = () => {
+    setFlowForm(prev => ({
+      ...prev,
+      responses: [...prev.responses, ""]
+    }));
+  };
+
+  const removeResponseField = (index: number) => {
+    setFlowForm(prev => ({
+      ...prev,
+      responses: prev.responses.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateResponse = (index: number, value: string) => {
+    setFlowForm(prev => ({
+      ...prev,
+      responses: prev.responses.map((response, i) => 
+        i === index ? value : response
+      )
+    }));
   };
 
   const getStatusBadge = (status: string) => {
@@ -141,150 +305,150 @@ export default function Chatbot() {
     <div>
       <Header 
         title="Chatbot & Conversas" 
-        description="Gerencie conversas automatizadas e atendimento" 
+        description="Configure as respostas automáticas, fluxos de conversa e integrações com IA para um atendimento mais eficiente" 
       />
 
       <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Conversas Ativas</p>
-                  <p className="text-2xl font-bold">12</p>
-                </div>
-                <MessageCircle className="w-8 h-8 text-primary" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Taxa de Resolução</p>
-                  <p className="text-2xl font-bold">87%</p>
-                </div>
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Tempo Médio</p>
-                  <p className="text-2xl font-bold">3.2min</p>
-                </div>
-                <Clock className="w-8 h-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Satisfação</p>
-                  <p className="text-2xl font-bold">4.8/5</p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-yellow-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="conversations">Conversas</TabsTrigger>
+            <TabsTrigger value="flows">Configurar Fluxos</TabsTrigger>
+            <TabsTrigger value="ai">Integrar IA</TabsTrigger>
+          </TabsList>
 
-        {/* Chat Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Conversations List */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Conversas</CardTitle>
-                <Button variant="outline" size="sm">
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-96">
-                <div className="space-y-2 p-4">
-                  {mockConversations.map((conversation) => (
-                    <div
-                      key={conversation.id}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedConversation === conversation.id
-                          ? "bg-primary/10 border border-primary/20"
-                          : "bg-muted/50 hover:bg-muted"
-                      }`}
-                      onClick={() => setSelectedConversation(conversation.id)}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback className="text-xs">
-                              {conversation.customerName.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-sm">{conversation.customerName}</p>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs">{getChannelIcon(conversation.channel)}</span>
-                              <span className="text-xs text-muted-foreground capitalize">{conversation.channel}</span>
+          <TabsContent value="conversations" className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Conversas Ativas</p>
+                      <p className="text-2xl font-bold">12</p>
+                    </div>
+                    <MessageCircle className="w-8 h-8 text-primary" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Taxa de Resolução</p>
+                      <p className="text-2xl font-bold">87%</p>
+                    </div>
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Tempo Médio</p>
+                      <p className="text-2xl font-bold">3.2min</p>
+                    </div>
+                    <Clock className="w-8 h-8 text-blue-600" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Satisfação</p>
+                      <p className="text-2xl font-bold">4.8/5</p>
+                    </div>
+                    <BarChart3 className="w-8 h-8 text-yellow-600" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Conversations List */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Conversas</CardTitle>
+                    <Button variant="outline" size="sm">
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ScrollArea className="h-96">
+                    <div className="space-y-2 p-4">
+                      {mockConversations.map((conversation) => (
+                        <div
+                          key={conversation.id}
+                          className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                            selectedConversation === conversation.id
+                              ? "bg-primary/10 border border-primary/20"
+                              : "bg-muted/50 hover:bg-muted"
+                          }`}
+                          onClick={() => setSelectedConversation(conversation.id)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">{getChannelIcon(conversation.channel)}</span>
+                                <h4 className="font-medium text-sm">{conversation.leadName}</h4>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">
+                                {conversation.lastMessage}
+                              </p>
+                              <span className="text-xs text-muted-foreground">
+                                {conversation.timestamp.toLocaleTimeString('pt-BR', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
+                              </span>
                             </div>
+                            {getStatusBadge(conversation.status)}
                           </div>
                         </div>
-                        {getStatusBadge(conversation.status)}
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {conversation.timestamp.toLocaleTimeString('pt-BR', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
 
-          {/* Chat Messages */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>
-                  {selectedConversation 
-                    ? mockConversations.find(c => c.id === selectedConversation)?.customerName || "Conversa"
-                    : "Selecione uma conversa"}
-                </CardTitle>
-                {selectedConversation && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
-                      {getChannelIcon(mockConversations.find(c => c.id === selectedConversation)?.channel || "whatsapp")}
-                    </span>
-                    {getStatusBadge(mockConversations.find(c => c.id === selectedConversation)?.status || "active")}
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {selectedConversation ? (
-                <div className="flex flex-col h-96">
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                        >
+              {/* Chat Window */}
+              <div className="lg:col-span-2">
+                <Card className="h-[500px] flex flex-col">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8">
+                          <AvatarFallback>
+                            <Bot className="w-4 h-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <CardTitle className="text-sm">Simulador de Chat</CardTitle>
+                          <p className="text-xs text-muted-foreground">Teste as respostas do bot</p>
+                        </div>
+                      </div>
+                      <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300">
+                        Online
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="flex-1 flex flex-col">
+                    <ScrollArea className="flex-1 pr-4">
+                      <div className="space-y-4">
+                        {messages.map((message) => (
                           <div
-                            className={`flex max-w-xs lg:max-w-md ${
-                              message.sender === "user" ? "flex-row-reverse" : "flex-row"
-                            } gap-2`}
+                            key={message.id}
+                            className={`flex gap-3 ${
+                              message.sender === "user" ? "flex-row-reverse" : ""
+                            }`}
                           >
                             <Avatar className="w-8 h-8">
                               <AvatarFallback>
@@ -292,81 +456,253 @@ export default function Chatbot() {
                               </AvatarFallback>
                             </Avatar>
                             <div
-                              className={`rounded-lg px-3 py-2 ${
+                              className={`rounded-lg px-3 py-2 max-w-xs ${
                                 message.sender === "user"
                                   ? "bg-primary text-primary-foreground"
                                   : "bg-muted"
                               }`}
                             >
                               <p className="text-sm">{message.content}</p>
-                              <p className="text-xs opacity-70 mt-1">
+                              <span className="text-xs opacity-70">
                                 {message.timestamp.toLocaleTimeString('pt-BR', { 
                                   hour: '2-digit', 
                                   minute: '2-digit' 
                                 })}
-                              </p>
+                              </span>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  
-                  <div className="p-4 border-t">
-                    <div className="flex gap-2">
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    
+                    <div className="flex gap-2 pt-4 border-t">
                       <Input
                         placeholder="Digite sua mensagem..."
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                        onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                        className="flex-1"
                       />
-                      <Button onClick={handleSendMessage}>
+                      <Button onClick={sendMessage} size="sm">
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-96 flex items-center justify-center">
-                  <div className="text-center">
-                    <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Selecione uma conversa</h3>
-                    <p className="text-muted-foreground">
-                      Escolha uma conversa da lista para visualizar e responder mensagens
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Bot Configuration */}
-        <Card className="bg-gradient-to-r from-primary/10 via-pink-500/10 to-cyan-500/10 border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 rounded-lg gradient-nxt flex items-center justify-center flex-shrink-0">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Configuração do Chatbot</h3>
-                <p className="text-muted-foreground mb-4">
-                  Configure as respostas automáticas, fluxos de conversa e integrações com IA para um atendimento mais eficiente.
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Configurar Fluxos
-                  </Button>
-                  <Button variant="outline">
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                    Integrar IA
-                  </Button>
-                </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          {/* Aba de Configuração de Fluxos */}
+          <TabsContent value="flows" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">Fluxos de Conversa</h3>
+                <p className="text-muted-foreground">Configure respostas automáticas baseadas em gatilhos</p>
+              </div>
+              <Dialog open={isFlowDialogOpen} onOpenChange={setIsFlowDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Fluxo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Criar Novo Fluxo</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="flow-name">Nome do Fluxo</Label>
+                        <Input
+                          id="flow-name"
+                          value={flowForm.name}
+                          onChange={(e) => setFlowForm(prev => ({...prev, name: e.target.value}))}
+                          placeholder="Ex: Boas-vindas"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="flow-trigger">Gatilho</Label>
+                        <Input
+                          id="flow-trigger"
+                          value={flowForm.trigger}
+                          onChange={(e) => setFlowForm(prev => ({...prev, trigger: e.target.value}))}
+                          placeholder="Ex: oi|olá|começar"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Respostas</Label>
+                      {flowForm.responses.map((response, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Textarea
+                            value={response}
+                            onChange={(e) => updateResponse(index, e.target.value)}
+                            placeholder="Digite a resposta automática..."
+                            className="flex-1"
+                          />
+                          {flowForm.responses.length > 1 && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => removeResponseField(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      <Button variant="outline" onClick={addResponseField}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Resposta
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={flowForm.active}
+                        onCheckedChange={(checked) => setFlowForm(prev => ({...prev, active: checked}))}
+                      />
+                      <Label>Fluxo ativo</Label>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button onClick={addChatFlow}>Criar Fluxo</Button>
+                      <Button variant="outline" onClick={() => setIsFlowDialogOpen(false)}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid gap-4">
+              {chatFlows.map((flow) => (
+                <Card key={flow.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold">{flow.name}</h4>
+                          <Badge variant={flow.active ? "default" : "secondary"}>
+                            {flow.active ? "Ativo" : "Inativo"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Gatilho: {flow.trigger}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {flow.responses.length} resposta(s) configurada(s)
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleFlowStatus(flow.id)}
+                        >
+                          {flow.active ? "Desativar" : "Ativar"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteFlow(flow.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Aba de Configuração de IA */}
+          <TabsContent value="ai" className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold">Integração com IA</h3>
+              <p className="text-muted-foreground">Configure o comportamento da inteligência artificial do chatbot</p>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  Configurações de IA
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={aiConfig.enabled}
+                    onCheckedChange={(checked) => setAiConfig(prev => ({...prev, enabled: checked}))}
+                  />
+                  <Label>Habilitar IA para respostas automáticas</Label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Modelo de IA</Label>
+                    <Select 
+                      value={aiConfig.model} 
+                      onValueChange={(value) => setAiConfig(prev => ({...prev, model: value}))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gpt-4o">GPT-4o (Recomendado)</SelectItem>
+                        <SelectItem value="gpt-4">GPT-4</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Criatividade (Temperature): {aiConfig.temperature}</Label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={aiConfig.temperature}
+                      onChange={(e) => setAiConfig(prev => ({...prev, temperature: parseFloat(e.target.value)}))}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Prompt do Sistema</Label>
+                  <Textarea
+                    value={aiConfig.systemPrompt}
+                    onChange={(e) => setAiConfig(prev => ({...prev, systemPrompt: e.target.value}))}
+                    placeholder="Defina o comportamento da IA..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mensagem de Fallback</Label>
+                  <Input
+                    value={aiConfig.fallbackMessage}
+                    onChange={(e) => setAiConfig(prev => ({...prev, fallbackMessage: e.target.value}))}
+                    placeholder="Mensagem quando a IA não conseguir responder"
+                  />
+                </div>
+
+                <Button onClick={saveAIConfig}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Configurações
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
