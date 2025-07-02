@@ -142,6 +142,33 @@ Changelog:
   - Interface administrativa para visualizar/editar/deletar tenants
   - Separação completa entre usuários super admin e clientes
 
+## Setup Automático
+
+O sistema agora inclui setup completo automático:
+
+### Scripts de Setup
+- `setup.sh` - Script principal de instalação completa
+- `scripts/setup-simple.js` - Inicialização do sistema
+- `scripts/startCrons.js` - Sistema de automações cron
+- `README-SETUP.md` - Documentação completa do setup
+
+### Comando de Setup
+```bash
+bash setup.sh
+```
+
+### Funcionalidades do Setup
+- Verificação automática de dependências
+- Migração do banco de dados
+- Criação de usuários admin padrão
+- Verificação de integrações disponíveis
+- Sistema de cron jobs para automações
+- Inicialização da aplicação
+
+### Variáveis de Ambiente
+- Obrigatórias: DATABASE_URL, SESSION_SECRET
+- Opcionais: ASAAS_KEY, SENDGRID_KEY, WHATSAPP_TOKEN, SLACK_WEBHOOK_URL, etc.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
