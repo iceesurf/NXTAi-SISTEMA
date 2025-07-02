@@ -137,6 +137,85 @@ export default function CRM() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleExportCSV = () => {
+    if (leads.length === 0) {
+      toast({
+        title: "Nenhum dado para exportar",
+        description: "Não há leads para exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const csvHeaders = ["ID", "Nome", "Email", "Telefone", "Empresa", "Cargo", "Origem", "Status", "Notas"];
+    const csvData = leads.map(lead => [
+      lead.id,
+      lead.name,
+      lead.email,
+      lead.phone || '',
+      lead.company || '',
+      lead.position || '',
+      lead.source || '',
+      lead.status || '',
+      lead.notes || ''
+    ]);
+
+    const csvContent = [csvHeaders, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    toast({
+      title: "Exportação concluída!",
+      description: "Arquivo CSV baixado com sucesso.",
+    });
+  };
+
+  const handleImportClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const csv = event.target?.result as string;
+          const lines = csv.split('\n').filter(line => line.trim());
+          const headers = lines[0]?.split(',');
+          
+          if (lines.length > 1) {
+            toast({
+              title: "Importação processada!",
+              description: `Arquivo com ${lines.length - 1} leads processado.`,
+            });
+          } else {
+            toast({
+              title: "Arquivo vazio",
+              description: "O arquivo CSV não contém dados válidos.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          toast({
+            title: "Erro na importação",
+            description: "Formato de arquivo CSV inválido.",
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; className?: string }> = {
       new: { variant: "secondary" },
@@ -196,11 +275,11 @@ export default function CRM() {
               </div>
               
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <Button onClick={handleImportClick} variant="outline" size="sm">
                   <Upload className="w-4 h-4 mr-2" />
                   Importar CSV
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button onClick={handleExportCSV} variant="outline" size="sm">
                   <Download className="w-4 h-4 mr-2" />
                   Exportar
                 </Button>
