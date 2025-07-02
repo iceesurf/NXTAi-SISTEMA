@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertLeadSchema, insertCampaignSchema, insertIntegrationSchema, insertAutomationSchema } from "@shared/schema";
+import { insertLeadSchema, insertCampaignSchema, insertIntegrationSchema, insertAutomationSchema, insertSiteRequestSchema } from "@shared/schema";
 import { randomBytes } from "crypto";
 
 function requireAuth(req: any, res: any, next: any) {
@@ -566,6 +566,78 @@ export function registerRoutes(app: Express): Server {
       res.sendStatus(204);
     } catch (error) {
       res.status(400).json({ message: "Erro ao deletar tenant" });
+    }
+  });
+
+  // Site Requests
+  app.get("/api/site-requests", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const siteRequests = await storage.getSiteRequestsByTenant(user.tenantId);
+      res.json(siteRequests);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar solicitações de site" });
+    }
+  });
+
+  app.post("/api/site-requests", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const siteRequestData = insertSiteRequestSchema.parse({
+        ...req.body,
+        tenantId: user.tenantId,
+      });
+      
+      const siteRequest = await storage.createSiteRequest(siteRequestData);
+      
+      // Enviar email de notificação (stub - funcional sem SendGrid)
+      console.log(`📧 Nova solicitação de site:`, {
+        from: siteRequest.email,
+        name: siteRequest.fullName,
+        company: siteRequest.company,
+        type: siteRequest.siteType,
+        description: siteRequest.description
+      });
+      
+      res.status(201).json(siteRequest);
+    } catch (error) {
+      console.error("Erro na solicitação de site:", error);
+      res.status(400).json({ message: "Dados inválidos para solicitação de site" });
+    }
+  });
+
+  app.patch("/api/site-requests/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const siteRequest = await storage.updateSiteRequest(parseInt(id), req.body);
+      res.json(siteRequest);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao atualizar solicitação" });
+    }
+  });
+
+  app.delete("/api/site-requests/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSiteRequest(parseInt(id));
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao deletar solicitação" });
+    }
+  });
+
+  // Rota administrativa para ver todas as solicitações de site
+  app.get("/api/admin/site-requests", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      if (!user.isSuperAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      const allSiteRequests = await storage.getAllSiteRequests();
+      res.json(allSiteRequests);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar todas as solicitações" });
     }
   });
 

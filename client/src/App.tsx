@@ -21,6 +21,7 @@ import Settings from "@/pages/settings";
 import Onboarding from "@/pages/onboarding";
 import TenantSignup from "@/pages/tenant-signup";
 import AdminPanel from "@/pages/admin-panel";
+import SiteRequests from "@/pages/site-requests";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -59,6 +60,7 @@ function Router() {
               <Route path="/chatbot" component={Chatbot} />
               <Route path="/integrations" component={Integrations} />
               <Route path="/automations" component={Automations} />
+              <Route path="/site-requests" component={SiteRequests} />
               <Route path="/api" component={ApiDocs} />
               <Route path="/team" component={Team} />
               <Route path="/settings" component={Settings} />

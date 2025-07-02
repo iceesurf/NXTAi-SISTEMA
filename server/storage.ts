@@ -7,6 +7,7 @@ import {
   integrations, 
   automations, 
   apiKeys,
+  siteRequests,
   type User, 
   type InsertUser,
   type Tenant,
@@ -22,7 +23,9 @@ import {
   type Automation,
   type InsertAutomation,
   type ApiKey,
-  type InsertApiKey
+  type InsertApiKey,
+  type SiteRequest,
+  type InsertSiteRequest
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -81,6 +84,13 @@ export interface IStorage {
   getApiKeysByTenant(tenantId: number): Promise<ApiKey[]>;
   createApiKey(apiKey: InsertApiKey): Promise<ApiKey>;
   deleteApiKey(id: number): Promise<void>;
+  
+  // Site Requests
+  getSiteRequestsByTenant(tenantId: number): Promise<SiteRequest[]>;
+  createSiteRequest(siteRequest: InsertSiteRequest): Promise<SiteRequest>;
+  updateSiteRequest(id: number, siteRequest: Partial<InsertSiteRequest>): Promise<SiteRequest>;
+  deleteSiteRequest(id: number): Promise<void>;
+  getAllSiteRequests(): Promise<SiteRequest[]>;
   
   sessionStore: any;
 }
@@ -300,6 +310,36 @@ export class DatabaseStorage implements IStorage {
 
   async deleteApiKey(id: number): Promise<void> {
     await db.delete(apiKeys).where(eq(apiKeys.id, id));
+  }
+
+  // Site Requests
+  async getSiteRequestsByTenant(tenantId: number): Promise<SiteRequest[]> {
+    return await db.select().from(siteRequests).where(eq(siteRequests.tenantId, tenantId)).orderBy(desc(siteRequests.createdAt));
+  }
+
+  async createSiteRequest(insertSiteRequest: InsertSiteRequest): Promise<SiteRequest> {
+    const [siteRequest] = await db
+      .insert(siteRequests)
+      .values(insertSiteRequest)
+      .returning();
+    return siteRequest;
+  }
+
+  async updateSiteRequest(id: number, updateSiteRequest: Partial<InsertSiteRequest>): Promise<SiteRequest> {
+    const [siteRequest] = await db
+      .update(siteRequests)
+      .set({ ...updateSiteRequest, updatedAt: new Date() })
+      .where(eq(siteRequests.id, id))
+      .returning();
+    return siteRequest;
+  }
+
+  async deleteSiteRequest(id: number): Promise<void> {
+    await db.delete(siteRequests).where(eq(siteRequests.id, id));
+  }
+
+  async getAllSiteRequests(): Promise<SiteRequest[]> {
+    return await db.select().from(siteRequests).orderBy(desc(siteRequests.createdAt));
   }
 }
 

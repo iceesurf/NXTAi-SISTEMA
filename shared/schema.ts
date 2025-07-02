@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -120,6 +120,21 @@ export const apiKeys = pgTable("api_keys", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Site Requests
+export const siteRequests = pgTable("site_requests", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  whatsapp: text("whatsapp").notNull(),
+  company: text("company"),
+  siteType: text("site_type").notNull(),
+  description: text("description").notNull(),
+  status: text("status").default("pendente"), // pendente, em_andamento, concluido
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const tenantsRelations = relations(tenants, ({ many }) => ({
   users: many(users),
@@ -205,6 +220,13 @@ export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
   }),
 }));
 
+export const siteRequestsRelations = relations(siteRequests, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [siteRequests.tenantId],
+    references: [tenants.id],
+  }),
+}));
+
 // Schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
@@ -253,6 +275,12 @@ export const insertApiKeySchema = createInsertSchema(apiKeys).omit({
   createdAt: true,
 });
 
+export const insertSiteRequestSchema = createInsertSchema(siteRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -277,3 +305,6 @@ export type InsertAutomation = z.infer<typeof insertAutomationSchema>;
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
+
+export type SiteRequest = typeof siteRequests.$inferSelect;
+export type InsertSiteRequest = z.infer<typeof insertSiteRequestSchema>;

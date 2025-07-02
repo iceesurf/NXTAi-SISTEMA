@@ -12,7 +12,8 @@ import {
   Settings, 
   LogOut,
   BookOpen,
-  Shield
+  Shield,
+  Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/logo";
@@ -25,6 +26,7 @@ const menuItems = [
   { href: "/chatbot", label: "Chatbot", icon: MessageCircle },
   { href: "/integrations", label: "Integrações", icon: Layers },
   { href: "/automations", label: "Automações", icon: Zap },
+  { href: "/site-requests", label: "Solicitar Site", icon: Globe },
   { href: "/api", label: "API Pública", icon: Code },
   { href: "/team", label: "Equipe", icon: Users },
   { href: "/settings", label: "Configurações", icon: Settings },

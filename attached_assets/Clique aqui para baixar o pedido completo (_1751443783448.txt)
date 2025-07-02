@@ -1,0 +1,161 @@
+
+# 📦 Pedido de Configuração Final e Completa da Plataforma DNXT.ai no Replit (Produção)
+
+⚠️ Instruções detalhadas para deixar a plataforma SaaS DNXT.ai pronta para uso real no domínio `dnxtai.com`. Sistema deve estar 100% funcional, sem dados fictícios, com todas as integrações, exportações, automações e formulários operacionais e visíveis. Nada pode estar “em desenvolvimento”.
+
+---
+
+## ✅ FUNCIONALIDADES ESSENCIAIS (DEVEM ESTAR FUNCIONANDO):
+
+### 1. Multi-Tenant
+- Separação de dados por `tenantId`
+- Admins: `samuel@dnxtai.com` / `admin123` e `leonardo@dnxtai.com` / `admin123`
+
+### 2. Autenticação e Sessões
+- Login, registro e sessão por cookie funcionando
+
+### 3. Painel Admin
+- Visualização total de clientes, leads, automações e pedidos de site
+- Logs de atividade, edição e status
+
+### 4. CRM
+- Gestão de leads com tags, histórico, filtros
+- Importar/Exportar (CSV e PDF) funcionando com botões visíveis
+
+### 5. Campanhas
+- Editor visual (e-mail + WhatsApp)
+- Agendamento e envio imediato
+- Filtros e logs
+
+### 6. Automações Visuais (drag and drop)
+- Gatilhos, condições e ações configuráveis
+- Logs de execução com erro/sucesso
+- Visualização e edição funcionando
+
+### 7. Automações Comuns Pré-configuradas
+- Boas-vindas automático
+- Lembrete de carrinho
+- Follow-up de cobrança
+- Feedback pós-venda
+- Alertas internos
+
+### 8. Fluxograma de Mensagens
+- Ferramenta drag-and-drop com preview
+- Gatilhos (lead, tag, data, integração)
+- Ações (e-mail, WhatsApp, Slack, Webhook, etc.)
+- Funcional mesmo sem chave externa
+
+### 9. Chatbot com IA
+- Painel "Configurar Fluxos" e "Integrar IA" 100% funcionando
+- Fluxos de respostas inteligentes simulados (com IA futura)
+
+### 10. Integrações Prontas (com placeholders)
+Estrutura já pronta, rotas funcionais e interface visível aguardando apenas as chaves:
+
+- ✅ ASAAS (boletos e cobranças via API e webhook)
+- ✅ SendGrid (e-mails transacionais)
+- ✅ RD Station (leads)
+- ✅ WhatsApp Business API (via Meta/360dialog/Twilio)
+- ✅ Slack (alertas internos)
+- ✅ Telegram (notificações)
+- ✅ Google Calendar (agendamento e integração)
+- ✅ Zapier (webhooks)
+- ✅ Meta Business API (Instagram Direct e Facebook Messenger):
+  - Enviar e receber mensagens via DM do Instagram
+  - Suporte a Facebook Messenger Inbox
+  - Webhooks de nova conversa
+  - Interface pronta com histórico, filtros e envio manual
+
+> Tudo deve estar implementado com interface visual funcional e backend configurado. Onde for necessário token/chave, deixar como variável de ambiente com valor fictício (`META_ACCESS_TOKEN`, etc.).
+
+---
+
+## 🆕 11. Formulário de Solicitação de Site
+
+Criar um menu chamado "Solicitar Site" com:
+
+- Formulário com:
+  - Nome completo
+  - Email
+  - WhatsApp
+  - Empresa
+  - Tipo de site desejado
+  - Descrição do projeto
+
+- Ao clicar em "Enviar Pedido":
+  - Enviar para o e-mail `samuel@dnxtai.com`
+  - Armazenar no banco com status
+  - Exibir no painel de `samuel@dnxtai.com` e `leonardo@dnxtai.com` como lista de chamados
+  - Permitir atualizar status: pendente, em andamento, concluído
+
+---
+
+## 📤 12. Exportação e Importação
+
+Em todos os módulos (Leads, Campanhas, Automação, Agendamentos, Tags):
+
+- Exportar em CSV e PDF — funcional
+- Importar CSV — validado, com preview e tratamento de erro
+- Botões visíveis e testados
+
+---
+
+## 🎨 13. Interface e Personalização
+
+- Tema escuro/claro
+- Logos, cores e nome customizáveis por tenant
+- Componentes: `shadcn/ui`
+- Responsivo e acessível
+- Cores base: Roxo `#6E00FF`, Rosa `#FF2CB4`, Azul Neon `#00F5FF`
+
+---
+
+## ⚙️ 14. Stack e Variáveis (.env)
+
+**Stack:**
+- Frontend: React 19, TypeScript, Vite, Tailwind, Wouter
+- Backend: Node.js, Express, Drizzle ORM
+- Banco: PostgreSQL (multi-tenant)
+- Auth: Session-based (Passport.js)
+
+**Variáveis no `.env`:**
+```
+DATABASE_URL=postgresql://user:pass@host/db
+SESSION_SECRET=chave-secreta
+NODE_ENV=production
+
+SENDGRID_API_KEY=stub_key
+ASAAS_API_KEY=stub_key
+RDSTATION_TOKEN=stub_key
+WHATSAPP_API_TOKEN=stub_key
+META_ACCESS_TOKEN=stub_key
+SLACK_TOKEN=stub_key
+TELEGRAM_TOKEN=stub_key
+GOOGLE_CALENDAR_CLIENT_ID=stub_key
+ZAPIER_WEBHOOK_URL=stub_key
+```
+
+---
+
+## 🚨 OBSERVAÇÕES FINAIS IMPORTANTES
+
+- ❌ Nada deve estar com dados fictícios.
+- ✅ Sem telas de teste, tudo funcional para uso imediato.
+- ✅ Todos os botões devem funcionar ou estar com placeholder ativado.
+- ✅ Sistema inicia corretamente no domínio `dnxtai.com`.
+- ✅ Chatbot, fluxograma, campanhas e CRM operacionais.
+- ✅ Painel do Admin com controle total.
+- ✅ Formulário de Solicitação de Site funcional, e-mails e painel.
+- ✅ Todas integrações visíveis e operacionais, mesmo sem chave real.
+
+---
+
+## ✅ RESUMO: o que o Replit deve garantir
+
+✔️ Plataforma 100% operacional, multi-tenant, pronta para produção  
+✔️ Nenhum botão quebrado ou pendente  
+✔️ Exportação/importação em todos os módulos  
+✔️ Integrações visuais e rotas API configuradas  
+✔️ Frontend e backend conectados e visíveis  
+✔️ IA, chatbot e fluxograma ativados  
+✔️ Painel de chamados funcional com envio de e-mail  
