@@ -83,6 +83,21 @@ const integrationTemplates: IntegrationTemplate[] = [
     ]
   },
   {
+    id: "meta",
+    name: "Meta Business",
+    description: "Facebook, Instagram e WhatsApp Business",
+    icon: MessageCircle,
+    category: "Marketing",
+    color: "bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
+    fields: [
+      { name: "accessToken", label: "Access Token", type: "password", placeholder: "Token de acesso do Meta", required: true },
+      { name: "appId", label: "App ID", type: "text", placeholder: "ID da aplicação Meta", required: true },
+      { name: "appSecret", label: "App Secret", type: "password", placeholder: "Segredo da aplicação", required: true },
+      { name: "pageId", label: "Page ID", type: "text", placeholder: "ID da página do Facebook" },
+      { name: "instagramBusinessId", label: "Instagram Business ID", type: "text", placeholder: "ID da conta comercial Instagram" }
+    ]
+  },
+  {
     id: "google",
     name: "Google Workspace",
     description: "Calendar, Gmail e outras APIs do Google",

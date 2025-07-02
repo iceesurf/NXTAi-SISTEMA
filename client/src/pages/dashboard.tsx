@@ -21,8 +21,15 @@ import {
   Slack
 } from "lucide-react";
 
+interface Stats {
+  totalLeads: number;
+  activeCampaigns: number;
+  botConversations: number;
+  conversionRate: string;
+}
+
 export default function Dashboard() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<Stats>({
     queryKey: ["/api/stats"],
   });
 
@@ -94,7 +101,10 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div>
-        <Header />
+        <Header 
+          title="Dashboard" 
+          description="Visão geral da sua plataforma NXT.ai" 
+        />
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -112,7 +122,10 @@ export default function Dashboard() {
 
   return (
     <div>
-      <Header />
+      <Header 
+        title="Dashboard" 
+        description="Visão geral da sua plataforma NXT.ai" 
+      />
       
       <div className="space-y-6">
         {/* Stats Cards */}
@@ -122,7 +135,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total de Leads</p>
-                  <p className="text-2xl font-bold">{stats?.totalLeads || 0}</p>
+                  <p className="text-2xl font-bold">{stats?.totalLeads ?? 0}</p>
                   <p className="text-sm text-green-600 dark:text-green-400">+12% este mês</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -137,7 +150,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Campanhas Ativas</p>
-                  <p className="text-2xl font-bold">{stats?.activeCampaigns || 0}</p>
+                  <p className="text-2xl font-bold">{stats?.activeCampaigns ?? 0}</p>
                   <p className="text-sm text-blue-600 dark:text-blue-400">5 enviadas hoje</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center">
@@ -152,7 +165,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Conversações Bot</p>
-                  <p className="text-2xl font-bold">{stats?.botConversations || 0}</p>
+                  <p className="text-2xl font-bold">{stats?.botConversations ?? 0}</p>
                   <p className="text-sm text-green-600 dark:text-green-400">+8% esta semana</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-cyan-100 dark:bg-cyan-900/20 flex items-center justify-center">
@@ -167,7 +180,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Taxa de Conversão</p>
-                  <p className="text-2xl font-bold">{stats?.conversionRate || "0.0"}%</p>
+                  <p className="text-2xl font-bold">{stats?.conversionRate ?? "0.0"}%</p>
                   <p className="text-sm text-green-600 dark:text-green-400">+3.2% este mês</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
