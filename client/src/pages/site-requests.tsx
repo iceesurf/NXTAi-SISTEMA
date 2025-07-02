@@ -127,31 +127,44 @@ export default function SiteRequests() {
     });
   };
 
-  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImportClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const csv = e.target?.result as string;
-        const lines = csv.split('\n');
-        const headers = lines[0].split(',');
-        
-        toast({
-          title: "Importação processada!",
-          description: `Arquivo com ${lines.length - 1} linhas processado.`,
-        });
-      } catch (error) {
-        toast({
-          title: "Erro na importação",
-          description: "Formato de arquivo inválido.",
-          variant: "destructive",
-        });
-      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const csv = event.target?.result as string;
+          const lines = csv.split('\n').filter(line => line.trim());
+          const headers = lines[0]?.split(',');
+          
+          if (lines.length > 1) {
+            toast({
+              title: "Importação processada!",
+              description: `Arquivo com ${lines.length - 1} linhas processado.`,
+            });
+          } else {
+            toast({
+              title: "Arquivo vazio",
+              description: "O arquivo CSV não contém dados válidos.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          toast({
+            title: "Erro na importação",
+            description: "Formato de arquivo CSV inválido.",
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsText(file);
     };
-    reader.readAsText(file);
-    event.target.value = '';
+    input.click();
   };
 
   const getStatusColor = (status: string) => {
@@ -190,22 +203,14 @@ export default function SiteRequests() {
             <Download className="h-4 w-4 mr-2" />
             Exportar CSV
           </Button>
-          <div className="relative">
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleImportCSV}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              id="import-csv"
-            />
-            <Button 
-              variant="outline"
-              className="transition-all duration-200"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Importar CSV
-            </Button>
-          </div>
+          <Button 
+            onClick={handleImportClick}
+            variant="outline"
+            className="transition-all duration-200"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar CSV
+          </Button>
           <Button 
             onClick={() => setShowForm(!showForm)}
             className="bg-primary hover:bg-primary/90 transition-all duration-200"

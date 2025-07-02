@@ -289,32 +289,37 @@ export default function WorkflowBuilder() {
     });
   }, [workflowName, nodes, toast]);
 
-  const importWorkflow = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImportClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const workflowData = JSON.parse(e.target?.result as string);
-        setWorkflowName(workflowData.name);
-        setNodes(workflowData.nodes);
-        
-        toast({
-          title: "Workflow importado!",
-          description: `Workflow "${workflowData.name}" importado com sucesso.`,
-        });
-      } catch (error) {
-        toast({
-          title: "Erro na importação",
-          description: "Arquivo JSON inválido.",
-          variant: "destructive",
-        });
-      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const workflowData = JSON.parse(event.target?.result as string);
+          setWorkflowName(workflowData.name || 'Workflow Importado');
+          setNodes(workflowData.nodes || []);
+          
+          toast({
+            title: "Workflow importado!",
+            description: `Workflow "${workflowData.name}" importado com sucesso.`,
+          });
+        } catch (error) {
+          toast({
+            title: "Erro na importação",
+            description: "Arquivo JSON inválido.",
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsText(file);
     };
-    reader.readAsText(file);
-    event.target.value = '';
-  }, [toast]);
+    input.click();
+  };
 
   return (
     <div className="container mx-auto space-y-6">
@@ -329,19 +334,10 @@ export default function WorkflowBuilder() {
           </p>
         </div>
         <div className="flex gap-2">
-          <div className="relative">
-            <input
-              type="file"
-              accept=".json"
-              onChange={importWorkflow}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              id="import-workflow"
-            />
-            <Button variant="outline">
-              <Upload className="h-4 w-4 mr-2" />
-              Importar
-            </Button>
-          </div>
+          <Button onClick={handleImportClick} variant="outline">
+            <Upload className="h-4 w-4 mr-2" />
+            Importar
+          </Button>
           <Button onClick={exportWorkflow} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Exportar
