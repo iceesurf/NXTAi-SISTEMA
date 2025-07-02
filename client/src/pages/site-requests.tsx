@@ -110,8 +110,8 @@ export default function SiteRequests() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto space-y-6">
+        <div className="flex items-center justify-between animate-fade-in">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Solicitar Site</h1>
             <p className="text-muted-foreground mt-2">
@@ -120,7 +120,7 @@ export default function SiteRequests() {
           </div>
           <Button 
             onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90"
+            className="bg-primary hover:bg-primary/90 transition-all duration-200"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nova Solicitação
@@ -128,7 +128,7 @@ export default function SiteRequests() {
         </div>
 
         {showForm && (
-          <Card>
+          <Card className="animate-fade-in transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
@@ -245,8 +245,8 @@ export default function SiteRequests() {
             </Card>
           ) : (
             <div className="grid gap-4">
-              {requests.map((request) => (
-                <Card key={request.id}>
+              {requests.map((request, index) => (
+                <Card key={request.id} className="animate-fade-in transition-all duration-200 hover:shadow-lg" style={{ animationDelay: `${index * 0.1}s` }}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>

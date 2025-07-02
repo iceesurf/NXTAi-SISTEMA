@@ -39,8 +39,8 @@ export default function Sidebar() {
   if (!user) return null;
 
   return (
-    <aside className="w-64 bg-sidebar-background border-r border-sidebar-border flex-shrink-0">
-      <div className="p-6">
+    <aside className="w-64 bg-sidebar-background border-r border-sidebar-border flex-shrink-0 overflow-hidden">
+      <div className="h-full overflow-y-auto scroll-smooth sidebar-scroll p-6">
         {/* Logo */}
         <div className="mb-8">
           <Logo size="md" />
@@ -57,7 +57,7 @@ export default function Sidebar() {
                 <Button
                   variant={isActive ? "default" : "ghost"}
                   className={cn(
-                    "w-full justify-start space-x-3",
+                    "w-full justify-start space-x-3 transition-all duration-200",
                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                   )}
                 >
