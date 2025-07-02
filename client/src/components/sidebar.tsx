@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useEasterEggContext } from "@/components/easter-egg-provider";
 import { Button } from "@/components/ui/button";
 import { 
   Home, 
@@ -14,7 +15,8 @@ import {
   BookOpen,
   Shield,
   Globe,
-  GitBranch
+  GitBranch,
+  HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/logo";
@@ -32,11 +34,13 @@ const menuItems = [
   { href: "/api", label: "API Pública", icon: Code },
   { href: "/team", label: "Equipe", icon: Users },
   { href: "/settings", label: "Configurações", icon: Settings },
+  { href: "/help", label: "Ajuda", icon: HelpCircle },
 ];
 
 export default function Sidebar() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
+  const { handleTripleClick } = useEasterEggContext();
 
   if (!user) return null;
 
@@ -45,7 +49,7 @@ export default function Sidebar() {
       <div className="h-full overflow-y-auto scroll-smooth sidebar-scroll p-6">
         {/* Logo */}
         <div className="mb-8">
-          <Logo size="md" />
+          <Logo size="md" onTripleClick={handleTripleClick} />
         </div>
 
         {/* Navigation */}

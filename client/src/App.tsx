@@ -5,8 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { EasterEggProvider, useEasterEggContext } from "@/components/easter-egg-provider";
+import EasterEggCounter from "@/components/easter-egg-counter";
 import { Loader2 } from "lucide-react";
 import { Redirect } from "wouter";
+import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
@@ -23,6 +26,7 @@ import TenantSignup from "@/pages/tenant-signup";
 import AdminPanel from "@/pages/admin-panel";
 import SiteRequests from "@/pages/site-requests";
 import WorkflowBuilder from "@/pages/workflow-builder";
+import Help from "@/pages/help";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -43,7 +47,37 @@ function ProtectedWrapper({ children }: { children: React.ReactNode }) {
     return <Redirect to="/auth" />;
   }
 
-  return <>{children}</>;
+  return (
+    <EasterEggWrapper>
+      {children}
+    </EasterEggWrapper>
+  );
+}
+
+function EasterEggWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <EasterEggProvider>
+      <EasterEggInner>{children}</EasterEggInner>
+    </EasterEggProvider>
+  );
+}
+
+function EasterEggInner({ children }: { children: React.ReactNode }) {
+  const { isMatrixMode } = useEasterEggContext();
+
+  useEffect(() => {
+    if (isMatrixMode) {
+      document.body.classList.add('matrix-mode');
+      return () => document.body.classList.remove('matrix-mode');
+    }
+  }, [isMatrixMode]);
+
+  return (
+    <>
+      {children}
+      <EasterEggCounter />
+    </>
+  );
 }
 
 function Router() {
@@ -68,6 +102,7 @@ function Router() {
               <Route path="/settings" component={Settings} />
               <Route path="/onboarding" component={Onboarding} />
               <Route path="/admin" component={AdminPanel} />
+              <Route path="/help" component={Help} />
               <Route component={NotFound} />
             </Switch>
           </Layout>

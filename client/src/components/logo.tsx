@@ -1,17 +1,43 @@
 import logoPath from "@assets/8CCED2DB-5B67-42DC-BE59-662DB3764285_1751404592788.png";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
   showText?: boolean;
+  onTripleClick?: () => void;
 }
 
 export default function Logo({ 
   size = "md", 
   className,
-  showText = true 
+  showText = true,
+  onTripleClick
 }: LogoProps) {
+  const [clickCount, setClickCount] = useState(0);
+  const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+
+    if (newCount === 3) {
+      onTripleClick?.();
+      setClickCount(0);
+      setClickTimer(null);
+    } else {
+      const timer = setTimeout(() => {
+        setClickCount(0);
+        setClickTimer(null);
+      }, 500);
+      setClickTimer(timer);
+    }
+  };
   const sizeClasses = {
     sm: "w-8 h-8",
     md: "w-12 h-12", 
@@ -25,11 +51,15 @@ export default function Logo({
   };
 
   return (
-    <div className={cn("flex items-center space-x-3", className)}>
+    <div 
+      className={cn("flex items-center space-x-3 cursor-pointer select-none", className)}
+      onClick={handleClick}
+      data-logo
+    >
       <img 
         src={logoPath} 
         alt="NXT.ai Logo" 
-        className={cn("object-contain", sizeClasses[size])}
+        className={cn("object-contain transition-transform duration-200 hover:scale-105", sizeClasses[size])}
       />
       {showText && (
         <div>
