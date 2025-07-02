@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 import Header from "@/components/header";
 import { 
   Users, 
@@ -34,38 +35,14 @@ export default function Dashboard() {
   });
 
   const quickActions = [
-    { icon: Plus, label: "Novo Lead", primary: true },
-    { icon: Send, label: "Nova Campanha" },
-    { icon: Upload, label: "Importar CSV" },
-    { icon: Settings, label: "Configurar Bot" },
+    { icon: Plus, label: "Novo Lead", primary: true, href: "/crm", action: "add_lead" },
+    { icon: Send, label: "Nova Campanha", href: "/campaigns", action: "new_campaign" },
+    { icon: Upload, label: "Importar CSV", href: "/crm", action: "import_csv" },
+    { icon: Settings, label: "Configurar Bot", href: "/chatbot", action: "config_bot" },
   ];
 
-  const recentActivities = [
-    {
-      icon: UserPlus,
-      title: "João Silva foi adicionado ao CRM",
-      time: "há 2 minutos",
-      color: "bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400"
-    },
-    {
-      icon: Mail,
-      title: 'Campanha "Black Friday 2024" foi enviada',
-      time: "há 15 minutos",
-      color: "bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-    },
-    {
-      icon: MessageCircle,
-      title: "Nova conversa no chatbot iniciada",
-      time: "há 1 hora",
-      color: "bg-purple-100 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400"
-    },
-    {
-      icon: TrendingUp,
-      title: 'Automação "Follow-up Lead" executada',
-      time: "há 2 horas",
-      color: "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400"
-    },
-  ];
+  // Atividades serão carregadas dinamicamente conforme uso real
+  const recentActivities: any[] = [];
 
   const integrations = [
     {
@@ -225,16 +202,17 @@ export default function Dashboard() {
               {quickActions.map((action, index) => {
                 const Icon = action.icon;
                 return (
-                  <Button
-                    key={index}
-                    className={`w-full justify-start space-x-3 ${
-                      action.primary ? "gradient-nxt text-white" : ""
-                    }`}
-                    variant={action.primary ? "default" : "outline"}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{action.label}</span>
-                  </Button>
+                  <Link key={index} href={action.href}>
+                    <Button
+                      className={`w-full justify-start space-x-3 ${
+                        action.primary ? "gradient-nxt text-white" : ""
+                      }`}
+                      variant={action.primary ? "default" : "outline"}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span>{action.label}</span>
+                    </Button>
+                  </Link>
                 );
               })}
             </CardContent>
@@ -254,20 +232,34 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentActivities.map((activity, index) => {
-                const Icon = activity.icon;
-                return (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className={`w-8 h-8 rounded-full ${activity.color} flex items-center justify-center flex-shrink-0`}>
-                      <Icon className="w-4 h-4" />
+              {recentActivities.length > 0 ? (
+                recentActivities.map((activity, index) => {
+                  const Icon = activity.icon;
+                  return (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className={`w-8 h-8 rounded-full ${activity.color} flex items-center justify-center flex-shrink-0`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-foreground">{activity.title}</p>
+                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-foreground">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="w-6 h-6 text-muted-foreground" />
                   </div>
-                );
-              })}
+                  <p className="text-sm text-muted-foreground">
+                    Nenhuma atividade recente ainda.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    As atividades aparecerão aqui conforme você usar o sistema.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
