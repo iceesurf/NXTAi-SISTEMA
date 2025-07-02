@@ -47,37 +47,40 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        console.log("🔍 Tentando autenticar:", username);
-        
-        // Tenta buscar por email primeiro, depois por username
-        let user = await storage.getUserByEmail(username);
-        if (!user) {
-          user = await storage.getUserByUsername(username);
+    new LocalStrategy(
+      { usernameField: "username" },
+      async (username, password, done) => {
+        try {
+          console.log("🔍 Tentando autenticar:", username);
+          
+          // Tenta buscar por email primeiro, depois por username
+          let user = await storage.getUserByEmail(username);
+          if (!user) {
+            user = await storage.getUserByUsername(username);
+          }
+          
+          if (!user) {
+            console.log("❌ Usuário não encontrado:", username);
+            return done(null, false);
+          }
+          
+          console.log("✅ Usuário encontrado:", user.email || user.username);
+          
+          const passwordMatch = await comparePasswords(password, user.password);
+          
+          if (!passwordMatch) {
+            console.log("❌ Senha incorreta para:", username);
+            return done(null, false);
+          }
+          
+          console.log("✅ Autenticação bem-sucedida para:", username);
+          return done(null, user);
+        } catch (error) {
+          console.error("❌ Erro na estratégia de autenticação:", error);
+          return done(error);
         }
-        
-        if (!user) {
-          console.log("❌ Usuário não encontrado:", username);
-          return done(null, false);
-        }
-        
-        console.log("✅ Usuário encontrado:", user.email || user.username);
-        
-        const passwordMatch = await comparePasswords(password, user.password);
-        
-        if (!passwordMatch) {
-          console.log("❌ Senha incorreta para:", username);
-          return done(null, false);
-        }
-        
-        console.log("✅ Autenticação bem-sucedida para:", username);
-        return done(null, user);
-      } catch (error) {
-        console.error("❌ Erro na estratégia de autenticação:", error);
-        return done(error);
-      }
-    }),
+      },
+    ),
   );
 
   passport.serializeUser((user, done) => done(null, user.id));
@@ -143,8 +146,14 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    // Suporte para login com email ou username no mesmo campo
     const identifier = req.body.email || req.body.username;
     console.log("🔐 Tentativa de login:", identifier);
+    
+    // Garantir que o passport receba o campo correto
+    if (req.body.email && !req.body.username) {
+      req.body.username = req.body.email;
+    }
     
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) {
