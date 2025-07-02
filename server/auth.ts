@@ -47,37 +47,37 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(
-      { usernameField: "email" },
-      async (email, password, done) => {
-        try {
-          console.log("🔍 Buscando usuário:", email);
-          const user = await storage.getUserByEmail(email);
-          
-          if (!user) {
-            console.log("❌ Usuário não encontrado:", email);
-            return done(null, false);
-          }
-          
-          console.log("✅ Usuário encontrado:", user.email);
-          console.log("🔑 Verificando senha...");
-          
-          const passwordMatch = await comparePasswords(password, user.password);
-          console.log("🔑 Senha válida:", passwordMatch);
-          
-          if (!passwordMatch) {
-            console.log("❌ Senha incorreta para:", email);
-            return done(null, false);
-          }
-          
-          console.log("✅ Autenticação bem-sucedida para:", email);
-          return done(null, user);
-        } catch (error) {
-          console.error("❌ Erro na estratégia de autenticação:", error);
-          return done(error);
+    new LocalStrategy(async (username, password, done) => {
+      try {
+        console.log("🔍 Tentando autenticar:", username);
+        
+        // Tenta buscar por email primeiro, depois por username
+        let user = await storage.getUserByEmail(username);
+        if (!user) {
+          user = await storage.getUserByUsername(username);
         }
-      },
-    ),
+        
+        if (!user) {
+          console.log("❌ Usuário não encontrado:", username);
+          return done(null, false);
+        }
+        
+        console.log("✅ Usuário encontrado:", user.email || user.username);
+        
+        const passwordMatch = await comparePasswords(password, user.password);
+        
+        if (!passwordMatch) {
+          console.log("❌ Senha incorreta para:", username);
+          return done(null, false);
+        }
+        
+        console.log("✅ Autenticação bem-sucedida para:", username);
+        return done(null, user);
+      } catch (error) {
+        console.error("❌ Erro na estratégia de autenticação:", error);
+        return done(error);
+      }
+    }),
   );
 
   passport.serializeUser((user, done) => done(null, user.id));
@@ -143,7 +143,9 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    console.log("🔐 Tentativa de login:", req.body.email);
+    console.log("📥 Body recebido:", JSON.stringify(req.body));
+    const identifier = req.body.email || req.body.username;
+    console.log("🔐 Tentativa de login:", identifier);
     
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) {
@@ -152,7 +154,7 @@ export function setupAuth(app: Express) {
       }
       
       if (!user) {
-        console.log("❌ Login falhou para:", req.body.email);
+        console.log("❌ Login falhou para:", identifier);
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
@@ -162,7 +164,7 @@ export function setupAuth(app: Express) {
           return next(loginErr);
         }
         
-        console.log("✅ Login bem-sucedido:", user.email);
+        console.log("✅ Login bem-sucedido:", user.email || user.username);
         res.status(200).json(user);
       });
     })(req, res, next);
