@@ -22,7 +22,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "nxt-ai-theme",
   ...props
 }: ThemeProviderProps) {
@@ -33,6 +33,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement
 
+    // Remove todas as classes de tema
     root.classList.remove("light", "dark")
 
     if (theme === "system") {
@@ -45,14 +46,18 @@ export function ThemeProvider({
       return
     }
 
+    // Adiciona a classe do tema ativo
     root.classList.add(theme)
+    
+    // Força refresh nas variáveis CSS
+    root.style.setProperty('color-scheme', theme)
   }, [theme])
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme)
+      setTheme(newTheme)
     },
   }
 

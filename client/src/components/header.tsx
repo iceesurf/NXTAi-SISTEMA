@@ -25,6 +25,15 @@ export default function Header({
   const handleThemeToggle = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
+    
+    // Debug: força a aplicação da classe
+    setTimeout(() => {
+      const root = document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(newTheme);
+      console.log("Tema aplicado:", newTheme, "Classes:", root.classList.toString());
+    }, 50);
+    
     toast({
       title: "Tema alterado",
       description: `Tema ${newTheme === "light" ? "claro" : "escuro"} ativado`,
