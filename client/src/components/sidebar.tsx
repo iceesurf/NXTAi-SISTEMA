@@ -13,7 +13,8 @@ import {
   LogOut,
   BookOpen,
   Shield,
-  Globe
+  Globe,
+  GitBranch
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/logo";
@@ -26,6 +27,7 @@ const menuItems = [
   { href: "/chatbot", label: "Chatbot", icon: MessageCircle },
   { href: "/integrations", label: "Integrações", icon: Layers },
   { href: "/automations", label: "Automações", icon: Zap },
+  { href: "/workflow-builder", label: "Fluxograma", icon: GitBranch },
   { href: "/site-requests", label: "Solicitar Site", icon: Globe },
   { href: "/api", label: "API Pública", icon: Code },
   { href: "/team", label: "Equipe", icon: Users },
