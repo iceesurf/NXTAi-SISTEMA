@@ -7,6 +7,12 @@ import { insertLeadSchema, insertCampaignSchema, insertIntegrationSchema, insert
 import { randomBytes } from "crypto";
 
 function requireAuth(req: any, res: any, next: any) {
+  console.log("🔐 Verificando autenticação:", {
+    isAuthenticated: req.isAuthenticated(),
+    sessionID: req.sessionID,
+    user: req.user ? `${req.user.email || req.user.username}` : 'null'
+  });
+  
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Não autorizado" });
   }
