@@ -143,7 +143,6 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    console.log("📥 Body recebido:", JSON.stringify(req.body));
     const identifier = req.body.email || req.body.username;
     console.log("🔐 Tentativa de login:", identifier);
     
