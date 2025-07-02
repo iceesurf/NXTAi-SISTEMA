@@ -8,10 +8,24 @@ app.use(express.urlencoded({ extended: false }));
 
 // Configuração de CORS para permitir cookies
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Lista de origens permitidas
+  const allowedOrigins = [
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "https://localhost:5000",
+    process.env.FRONTEND_URL
+  ].filter(Boolean);
+  
+  // Permite a origem se ela estiver na lista ou se não há origem (requisições do mesmo servidor)
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
+  
   res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie");
   
   if (req.method === "OPTIONS") {
     res.sendStatus(200);

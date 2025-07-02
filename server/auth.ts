@@ -34,11 +34,14 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    name: "connect.sid",
     cookie: {
-      secure: false, // Permitir cookies em HTTP durante desenvolvimento
-      httpOnly: true,
+      secure: false, // HTTP em desenvolvimento
+      httpOnly: false, // Permitir acesso via JavaScript para debugging
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: "lax", // Permitir cookies cross-site em desenvolvimento
+      sameSite: "lax",
+      domain: undefined, // Não definir domínio específico
+      path: "/",
     },
   };
 
