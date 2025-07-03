@@ -28,6 +28,8 @@ const menuItems = [
   { href: "/crm", label: "CRM & Leads", icon: Users },
   { href: "/campaigns", label: "Campanhas", icon: Mail },
   { href: "/chatbot", label: "Chatbot", icon: MessageCircle },
+  { href: "/inbox", label: "Inbox", icon: MessageCircle },
+  { href: "/flow-builder", label: "Editor de Fluxos", icon: Zap },
   { href: "/content-scheduler", label: "Agendamento", icon: Calendar },
   { href: "/integrations", label: "Integrações", icon: Layers },
   { href: "/automations", label: "Automações", icon: Zap },

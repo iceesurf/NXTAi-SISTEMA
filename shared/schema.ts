@@ -152,6 +152,56 @@ export const scheduledPosts = pgTable("scheduled_posts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Chat Messages  
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
+  conversationId: integer("conversation_id").references(() => conversations.id),
+  leadId: integer("lead_id").references(() => leads.id),
+  senderId: integer("sender_id").references(() => users.id),
+  senderType: text("sender_type").notNull(), // user, lead, bot
+  messageType: text("message_type").default("text"), // text, image, file, button_response
+  content: text("content").notNull(),
+  metadata: jsonb("metadata").default({}), // platform-specific data, attachments
+  isRead: boolean("is_read").default(false),
+  platform: text("platform").default("web"), // web, whatsapp, instagram, telegram
+  externalId: text("external_id"), // ID from external platform
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Chatbot Flows
+export const chatbotFlows = pgTable("chatbot_flows", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
+  createdBy: integer("created_by").references(() => users.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  trigger: text("trigger").notNull(), // new_lead, keyword, webhook, manual
+  triggerConditions: jsonb("trigger_conditions").default({}),
+  flowData: jsonb("flow_data").notNull(), // visual flow structure
+  isActive: boolean("is_active").default(false),
+  version: integer("version").default(1),
+  stats: jsonb("stats").default({}), // engagement statistics
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Flow Executions (track flow runs)
+export const flowExecutions = pgTable("flow_executions", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
+  flowId: integer("flow_id").references(() => chatbotFlows.id).notNull(),
+  leadId: integer("lead_id").references(() => leads.id),
+  conversationId: integer("conversation_id").references(() => conversations.id),
+  currentStep: text("current_step"),
+  variables: jsonb("variables").default({}), // dynamic variables for this execution
+  status: text("status").default("running"), // running, completed, failed, paused
+  completedAt: timestamp("completed_at"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const tenantsRelations = relations(tenants, ({ many }) => ({
   users: many(users),
@@ -255,6 +305,56 @@ export const scheduledPostsRelations = relations(scheduledPosts, ({ one }) => ({
   }),
 }));
 
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [chatMessages.tenantId],
+    references: [tenants.id],
+  }),
+  conversation: one(conversations, {
+    fields: [chatMessages.conversationId],
+    references: [conversations.id],
+  }),
+  lead: one(leads, {
+    fields: [chatMessages.leadId],
+    references: [leads.id],
+  }),
+  sender: one(users, {
+    fields: [chatMessages.senderId],
+    references: [users.id],
+  }),
+}));
+
+export const chatbotFlowsRelations = relations(chatbotFlows, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [chatbotFlows.tenantId],
+    references: [tenants.id],
+  }),
+  creator: one(users, {
+    fields: [chatbotFlows.createdBy],
+    references: [users.id],
+  }),
+  executions: many(flowExecutions),
+}));
+
+export const flowExecutionsRelations = relations(flowExecutions, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [flowExecutions.tenantId],
+    references: [tenants.id],
+  }),
+  flow: one(chatbotFlows, {
+    fields: [flowExecutions.flowId],
+    references: [chatbotFlows.id],
+  }),
+  lead: one(leads, {
+    fields: [flowExecutions.leadId],
+    references: [leads.id],
+  }),
+  conversation: one(conversations, {
+    fields: [flowExecutions.conversationId],
+    references: [conversations.id],
+  }),
+}));
+
 // Schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
@@ -316,6 +416,24 @@ export const insertScheduledPostSchema = createInsertSchema(scheduledPosts).omit
   publishedAt: true,
 });
 
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatbotFlowSchema = createInsertSchema(chatbotFlows).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFlowExecutionSchema = createInsertSchema(flowExecutions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -346,3 +464,12 @@ export type InsertSiteRequest = z.infer<typeof insertSiteRequestSchema>;
 
 export type ScheduledPost = typeof scheduledPosts.$inferSelect;
 export type InsertScheduledPost = z.infer<typeof insertScheduledPostSchema>;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type ChatbotFlow = typeof chatbotFlows.$inferSelect;
+export type InsertChatbotFlow = z.infer<typeof insertChatbotFlowSchema>;
+
+export type FlowExecution = typeof flowExecutions.$inferSelect;
+export type InsertFlowExecution = z.infer<typeof insertFlowExecutionSchema>;

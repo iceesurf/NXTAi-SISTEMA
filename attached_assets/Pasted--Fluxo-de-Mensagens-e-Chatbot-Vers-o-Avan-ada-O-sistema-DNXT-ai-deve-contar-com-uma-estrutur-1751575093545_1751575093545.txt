@@ -1,0 +1,73 @@
+## 💬 Fluxo de Mensagens e Chatbot – Versão Avançada
+
+O sistema DNXT.ai deve contar com uma estrutura completa e funcional de comunicação, tanto para mensagens diretas (chat) quanto para fluxos automatizados (chatbot com lógica visual). Tudo isso deve ser funcional de ponta a ponta, sem placeholder nem dados falsos.
+
+---
+
+### 1. Chat de Mensagens em Tempo Real (Inbox)
+
+- Comunicação direta entre:
+  - Cliente final ↔ Atendente/Superadmin
+  - Chat interno entre usuários do sistema (ex: Leonardo e Samuel)
+- Interface responsiva, com:
+  - Status de leitura
+  - Filtragem por lead/etapa
+  - Integração com notificações
+- As mensagens devem ser armazenadas em banco e exibidas em tempo real.
+- Devem aparecer automaticamente no painel de Samuel e Leonardo.
+
+---
+
+### 2. Chatbot com Fluxo Visual (Drag and Drop)
+
+- Editor visual com lógica de blocos conectáveis (estilo builder/flowchart)
+- Permitir:
+  - Criar gatilhos por evento: novo lead, clique, não resposta, etc.
+  - Criar condições lógicas (ex: "se lead clicar em tal opção, enviar mensagem X")
+  - Acionar ações externas (webhooks, email, automações)
+- Exemplo de fluxo real:
+  [Lead entrou no funil] → [Mensagem de boas-vindas] → [Pergunta com botões] →
+  [Se clicar em “Quero saber mais”] → [Disparar agendamento + Email] →
+  [Se não clicar em nada em 2h] → [Mensagem de follow-up]
+- Deve estar 100% funcional no frontend e backend, sem travar ou simular respostas.
+
+---
+
+### 3. Ações e Respostas Inteligentes
+
+- Ações automatizadas possíveis dentro do fluxo:
+  - Enviar email
+  - Atualizar lead no CRM
+  - Marcar tarefa interna
+  - Criar alerta para o admin
+  - Redirecionar para outro fluxo
+- Suporte a variáveis dinâmicas:
+  - {{nome}}, {{email}}, {{data_agendada}}, etc.
+
+---
+
+### 4. Integrações com Mensageria Real
+
+- O sistema deve suportar e integrar o fluxo com APIs externas, como:
+  - WhatsApp Oficial (Meta/360dialog)
+  - Instagram Direct (Mensagens)
+  - Telegram Bots, Slack Alerts, Google Calendar
+- Deve permitir disparos e recepção de mensagens dentro do mesmo fluxo visual.
+- As integrações devem estar estruturalmente prontas, mesmo sem a chave ainda ativa.
+
+---
+
+### 5. Testes e Visualização do Fluxo
+
+- O admin deve conseguir:
+  - Testar um fluxo antes de publicar
+  - Ver estatísticas de onde os leads pararam no caminho
+  - Clonar e editar fluxos anteriores
+
+---
+
+### IMPORTANTE
+
+Todo o fluxo deve estar ativo e testável direto no Replit, sem necessidade de configurações externas.  
+Não deve exibir fluxos “de exemplo” nem diálogos falsos.  
+O painel de Samuel deve permitir visualizar e editar todos os fluxos e mensagens recebidas.

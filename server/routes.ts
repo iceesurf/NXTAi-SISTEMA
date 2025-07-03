@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { z } from "zod";
@@ -740,6 +741,178 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Chat Messages
+  app.get("/api/chat/messages", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const messages = await storage.getChatMessagesByTenant(user.tenantId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar mensagens" });
+    }
+  });
+
+  app.get("/api/chat/conversations/:id/messages", requireAuth, async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const messages = await storage.getChatMessagesByConversation(conversationId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar mensagens da conversa" });
+    }
+  });
+
+  app.post("/api/chat/messages", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const messageData = {
+        ...req.body,
+        tenantId: user.tenantId,
+        senderId: user.id,
+        senderType: 'user'
+      };
+      const message = await storage.createChatMessage(messageData);
+      res.status(201).json(message);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao enviar mensagem" });
+    }
+  });
+
+  app.patch("/api/chat/messages/:id/read", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.markMessageAsRead(id);
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao marcar mensagem como lida" });
+    }
+  });
+
+  // Chatbot Flows
+  app.get("/api/chatbot/flows", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const flows = await storage.getChatbotFlowsByTenant(user.tenantId);
+      res.json(flows);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar fluxos de chatbot" });
+    }
+  });
+
+  app.post("/api/chatbot/flows", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const flowData = {
+        ...req.body,
+        tenantId: user.tenantId,
+        createdBy: user.id
+      };
+      const flow = await storage.createChatbotFlow(flowData);
+      res.status(201).json(flow);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao criar fluxo de chatbot" });
+    }
+  });
+
+  app.patch("/api/chatbot/flows/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const flow = await storage.updateChatbotFlow(id, req.body);
+      res.json(flow);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao atualizar fluxo" });
+    }
+  });
+
+  app.delete("/api/chatbot/flows/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteChatbotFlow(id);
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao deletar fluxo" });
+    }
+  });
+
+  // Flow Executions
+  app.get("/api/chatbot/executions", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const executions = await storage.getFlowExecutionsByTenant(user.tenantId);
+      res.json(executions);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar execuções de fluxo" });
+    }
+  });
+
+  app.post("/api/chatbot/executions", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const executionData = {
+        ...req.body,
+        tenantId: user.tenantId
+      };
+      const execution = await storage.createFlowExecution(executionData);
+      res.status(201).json(execution);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao criar execução de fluxo" });
+    }
+  });
+
+  app.patch("/api/chatbot/executions/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const execution = await storage.updateFlowExecution(id, req.body);
+      res.json(execution);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao atualizar execução" });
+    }
+  });
+
   const httpServer = createServer(app);
+  
+  // WebSocket Server para chat em tempo real
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  wss.on('connection', (ws: WebSocket, req) => {
+    console.log('Nova conexão WebSocket estabelecida');
+    
+    ws.on('message', async (message: string) => {
+      try {
+        const data = JSON.parse(message);
+        
+        if (data.type === 'new_message') {
+          // Broadcast a nova mensagem para todos os clientes conectados
+          const messageData = await storage.createChatMessage(data.payload);
+          
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: 'message_received',
+                data: messageData
+              }));
+            }
+          });
+        }
+        
+        if (data.type === 'join_conversation') {
+          // Usuário entrou em uma conversa específica
+          ws.conversationId = data.conversationId;
+        }
+        
+      } catch (error) {
+        console.error('Erro ao processar mensagem WebSocket:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      console.log('Conexão WebSocket fechada');
+    });
+    
+    ws.on('error', (error) => {
+      console.error('Erro WebSocket:', error);
+    });
+  });
+
   return httpServer;
 }

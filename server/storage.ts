@@ -9,6 +9,9 @@ import {
   apiKeys,
   siteRequests,
   scheduledPosts,
+  chatMessages,
+  chatbotFlows,
+  flowExecutions,
   type User, 
   type InsertUser,
   type Tenant,
@@ -28,7 +31,13 @@ import {
   type SiteRequest,
   type InsertSiteRequest,
   type ScheduledPost,
-  type InsertScheduledPost
+  type InsertScheduledPost,
+  type ChatMessage,
+  type InsertChatMessage,
+  type ChatbotFlow,
+  type InsertChatbotFlow,
+  type FlowExecution,
+  type InsertFlowExecution
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -100,6 +109,23 @@ export interface IStorage {
   createScheduledPost(post: InsertScheduledPost): Promise<ScheduledPost>;
   updateScheduledPost(id: number, post: Partial<InsertScheduledPost>): Promise<ScheduledPost>;
   deleteScheduledPost(id: number): Promise<void>;
+
+  // Chat Messages
+  getChatMessagesByTenant(tenantId: number): Promise<ChatMessage[]>;
+  getChatMessagesByConversation(conversationId: number): Promise<ChatMessage[]>;
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  markMessageAsRead(id: number): Promise<void>;
+
+  // Chatbot Flows
+  getChatbotFlowsByTenant(tenantId: number): Promise<ChatbotFlow[]>;
+  createChatbotFlow(flow: InsertChatbotFlow): Promise<ChatbotFlow>;
+  updateChatbotFlow(id: number, flow: Partial<InsertChatbotFlow>): Promise<ChatbotFlow>;
+  deleteChatbotFlow(id: number): Promise<void>;
+
+  // Flow Executions
+  getFlowExecutionsByTenant(tenantId: number): Promise<FlowExecution[]>;
+  createFlowExecution(execution: InsertFlowExecution): Promise<FlowExecution>;
+  updateFlowExecution(id: number, execution: Partial<InsertFlowExecution>): Promise<FlowExecution>;
   
   sessionStore: any;
 }
@@ -379,6 +405,58 @@ export class DatabaseStorage implements IStorage {
 
   async deleteScheduledPost(id: number): Promise<void> {
     await db.delete(scheduledPosts).where(eq(scheduledPosts.id, id));
+  }
+
+  // Chat Messages
+  async getChatMessagesByTenant(tenantId: number): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages).where(eq(chatMessages.tenantId, tenantId)).orderBy(chatMessages.createdAt);
+  }
+
+  async getChatMessagesByConversation(conversationId: number): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages).where(eq(chatMessages.conversationId, conversationId)).orderBy(chatMessages.createdAt);
+  }
+
+  async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values(insertMessage).returning();
+    return message;
+  }
+
+  async markMessageAsRead(id: number): Promise<void> {
+    await db.update(chatMessages).set({ isRead: true }).where(eq(chatMessages.id, id));
+  }
+
+  // Chatbot Flows
+  async getChatbotFlowsByTenant(tenantId: number): Promise<ChatbotFlow[]> {
+    return await db.select().from(chatbotFlows).where(eq(chatbotFlows.tenantId, tenantId)).orderBy(chatbotFlows.createdAt);
+  }
+
+  async createChatbotFlow(insertFlow: InsertChatbotFlow): Promise<ChatbotFlow> {
+    const [flow] = await db.insert(chatbotFlows).values(insertFlow).returning();
+    return flow;
+  }
+
+  async updateChatbotFlow(id: number, updateFlow: Partial<InsertChatbotFlow>): Promise<ChatbotFlow> {
+    const [flow] = await db.update(chatbotFlows).set(updateFlow).where(eq(chatbotFlows.id, id)).returning();
+    return flow;
+  }
+
+  async deleteChatbotFlow(id: number): Promise<void> {
+    await db.delete(chatbotFlows).where(eq(chatbotFlows.id, id));
+  }
+
+  // Flow Executions
+  async getFlowExecutionsByTenant(tenantId: number): Promise<FlowExecution[]> {
+    return await db.select().from(flowExecutions).where(eq(flowExecutions.tenantId, tenantId)).orderBy(flowExecutions.createdAt);
+  }
+
+  async createFlowExecution(insertExecution: InsertFlowExecution): Promise<FlowExecution> {
+    const [execution] = await db.insert(flowExecutions).values(insertExecution).returning();
+    return execution;
+  }
+
+  async updateFlowExecution(id: number, updateExecution: Partial<InsertFlowExecution>): Promise<FlowExecution> {
+    const [execution] = await db.update(flowExecutions).set(updateExecution).where(eq(flowExecutions.id, id)).returning();
+    return execution;
   }
 }
 

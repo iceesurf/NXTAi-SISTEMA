@@ -28,6 +28,8 @@ import SiteRequests from "@/pages/site-requests";
 import WorkflowBuilder from "@/pages/workflow-builder";
 import Help from "@/pages/help";
 import ContentScheduler from "@/pages/content-scheduler";
+import Inbox from "@/pages/inbox";
+import FlowBuilder from "@/pages/flow-builder";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -94,6 +96,8 @@ function Router() {
               <Route path="/crm" component={CRM} />
               <Route path="/campaigns" component={Campaigns} />
               <Route path="/chatbot" component={Chatbot} />
+              <Route path="/inbox" component={Inbox} />
+              <Route path="/flow-builder" component={FlowBuilder} />
               <Route path="/integrations" component={Integrations} />
               <Route path="/automations" component={Automations} />
               <Route path="/workflow-builder" component={WorkflowBuilder} />

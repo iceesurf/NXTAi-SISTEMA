@@ -157,6 +157,17 @@ Changelog:
   - Todos os módulos operacionais
   - Sistema pronto para deploy imediato no Replit
   - Documentação completa para produção
+- July 03, 2025. Sistema de mensagens e chatbot avançado implementado:
+  - Chat em tempo real (Inbox) com interface completa e WebSocket
+  - Editor visual de fluxos de chatbot com drag-and-drop
+  - Tabelas de banco: chat_messages, chatbot_flows, flow_executions
+  - APIs completas para mensagens e fluxos (/api/chat/*, /api/chatbot/*)
+  - WebSocket server em /ws para comunicação em tempo real
+  - Interface de construção de fluxos visuais com componentes arrastavéis
+  - Sistema de execução de fluxos com tracking de status
+  - Páginas: /inbox (mensagens) e /flow-builder (editor visual)
+  - Sidebar atualizada com novas funcionalidades
+  - Sistema preparado para integrações externas (WhatsApp, Telegram, etc.)
 
 ## Setup Automático
 
