@@ -7,10 +7,12 @@ try {
   // Verificar dependências
   console.log('📦 Verificando dependências...');
   
-  // Executar seeder existente que já funciona
-  console.log('🛠️ Executando migrações e seeding...');
+  // Executar apenas migrações - sem dados fictícios
+  console.log('🛠️ Executando migrações de produção...');
   execSync('npm run db:push', { stdio: 'inherit' });
-  execSync('node server/seed.ts', { stdio: 'inherit' });
+  
+  // Executar apenas setup básico de produção
+  execSync('tsx server/seed.ts', { stdio: 'inherit' });
   
   console.log('✅ Setup concluído com sucesso!');
   console.log('📝 Usuários criados:');

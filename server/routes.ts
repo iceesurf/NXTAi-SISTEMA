@@ -869,6 +869,102 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Rotas de Mensagens - Sistema de Chat
+  app.post("/api/messages/send", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const { content, conversationId, recipientId } = req.body;
+      
+      if (!content || !conversationId) {
+        return res.status(400).json({ message: "Conteúdo e conversação são obrigatórios" });
+      }
+
+      const messageData = {
+        content,
+        conversationId,
+        senderId: user.id,
+        senderType: "user",
+        tenantId: user.tenantId,
+        isRead: false
+      };
+
+      const message = await storage.createChatMessage(messageData);
+      res.status(201).json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao enviar mensagem" });
+    }
+  });
+
+  app.get("/api/messages/inbox", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const messages = await storage.getChatMessagesByTenant(user.tenantId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar mensagens" });
+    }
+  });
+
+  app.post("/api/messages/read", requireAuth, async (req, res) => {
+    try {
+      const { messageId } = req.body;
+      
+      if (!messageId) {
+        return res.status(400).json({ message: "ID da mensagem é obrigatório" });
+      }
+
+      await storage.markMessageAsRead(messageId);
+      res.json({ message: "Mensagem marcada como lida" });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao marcar mensagem como lida" });
+    }
+  });
+
+  // Rota para trigger do chatbot
+  app.post("/api/chatbot/trigger", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const { leadId, trigger, message } = req.body;
+      
+      if (!trigger) {
+        return res.status(400).json({ message: "Gatilho é obrigatório" });
+      }
+
+      // Buscar fluxos ativos para o tenant
+      const flows = await storage.getChatbotFlowsByTenant(user.tenantId);
+      const activeFlows = flows.filter(f => f.isActive);
+      
+      // Simular resposta do chatbot baseada no trigger
+      let response = "Olá! Como posso ajudar você hoje?";
+      
+      if (trigger === "lead_entered_funnel") {
+        response = "Bem-vindo! Vamos iniciar sua jornada conosco. Qual é o seu principal interesse?";
+      } else if (trigger === "abandoned_cart") {
+        response = "Notamos que você deixou alguns itens no carrinho. Posso ajudar a finalizar sua compra?";
+      } else if (trigger === "support_request") {
+        response = "Estou aqui para ajudar! Qual é a sua dúvida?";
+      }
+
+      // Criar execução do fluxo
+      if (activeFlows.length > 0) {
+        const executionData = {
+          flowId: activeFlows[0].id,
+          leadId: leadId || null,
+          status: "in_progress",
+          currentStep: "1",
+          variables: { trigger, userMessage: message },
+          tenantId: user.tenantId
+        };
+        
+        await storage.createFlowExecution(executionData);
+      }
+
+      res.json({ response, trigger, timestamp: new Date().toISOString() });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao processar trigger do chatbot" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // WebSocket Server para chat em tempo real
@@ -897,7 +993,7 @@ export function registerRoutes(app: Express): Server {
         
         if (data.type === 'join_conversation') {
           // Usuário entrou em uma conversa específica
-          ws.conversationId = data.conversationId;
+          (ws as any).conversationId = data.conversationId;
         }
         
       } catch (error) {

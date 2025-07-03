@@ -168,7 +168,7 @@ export default function Chatbot() {
     }
   ];
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!messageInput.trim() || isTyping) return;
     
     const userMessage: Message = {
@@ -179,20 +179,38 @@ export default function Chatbot() {
     };
     
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = messageInput;
     setMessageInput("");
     setIsTyping(true);
-    
-    // Simular resposta do bot com indicador de digitação
-    setTimeout(() => {
+
+    try {
+      // Enviar mensagem real para a API
+      const response = await apiRequest("POST", "/api/chatbot/trigger", {
+        trigger: "user_message",
+        message: currentMessage,
+        leadId: selectedConversation
+      });
+
+      const responseData = await response.json();
       setIsTyping(false);
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Obrigado pela sua mensagem! Um de nossos especialistas entrará em contato em breve.",
+        content: responseData.response || "Obrigado pela sua mensagem! Um de nossos especialistas entrará em contato em breve.",
         sender: "bot",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botResponse]);
-    }, 2000);
+
+      // Invalidar cache para atualizar dados
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbot/conversations"] });
+    } catch (error) {
+      setIsTyping(false);
+      toast({
+        title: "Erro ao enviar mensagem",
+        description: "Não foi possível enviar sua mensagem. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Funções para gerenciar fluxos do chatbot

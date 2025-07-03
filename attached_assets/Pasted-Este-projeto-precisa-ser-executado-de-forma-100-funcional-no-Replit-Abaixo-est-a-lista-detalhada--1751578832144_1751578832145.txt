@@ -1,0 +1,79 @@
+Este projeto precisa ser executado de forma 100% funcional no Replit. Abaixo está a lista detalhada do que precisa ser corrigido imediatamente para o sistema entrar em produção real.
+
+---
+
+### RESUMO DAS CORREÇÕES EXIGIDAS
+
+#### 1. Chat de Mensagens Diretas (Inbox)
+
+- O chat atual não envia nem recebe mensagens reais.
+- Criar as seguintes rotas no backend:
+  - POST /api/messages/send: para envio de mensagens
+  - GET /api/messages/inbox: para listar mensagens recebidas
+  - POST /api/messages/read: para marcar como lidas
+- As mensagens devem ser salvas no banco (tabela messages) com campos: from, to, content, timestamp, read.
+
+#### 2. Chatbot com Fluxo Automatizado (Visual)
+
+- O fluxo visual precisa estar conectado ao backend e executar ações reais.
+- Criar rota:
+  - POST /api/chatbot/trigger: que recebe leadId e gatilho, e retorna resposta programada.
+- O fluxo deve responder com base em regras definidas na tabela chatbotFlows.
+- Deve funcionar com:
+  - Gatilhos por evento (ex: lead entrou no funil)
+  - Respostas automáticas e delays simulados
+  - Execução de ações (como agendar, marcar no CRM, enviar email)
+
+#### 3. Botões Inativos
+
+- Vários botões no painel (como Enviar, Criar Lead, Executar Automação) não disparam nenhuma ação.
+- Verificar os onClick e handlers em arquivos como:
+  - chatbot.tsx
+  - help.tsx
+  - dashboard.tsx
+  - components/ui/Button.tsx
+
+#### 4. Remoção de Dados Falsos
+
+- O script server/seed.ts está povoando o sistema com dados fictícios (leads simulados, dashboards irreais, campanhas falsas).
+- Apagar ou comentar todo o conteúdo do seed.ts
+- Garantir que o setup.sh ou qualquer comando de deploy não execute o seed.ts
+- Banco deve iniciar limpo, com dados reais ou em branco
+
+---
+
+### DEVE FUNCIONAR AO RODAR:Isso deve:
+- Criar usuários reais
+- Iniciar banco e backend
+- Ativar chat, chatbot, painel, CRM, campanhas
+- Exibir dados reais (ou vazios), nunca simulados
+
+---
+
+### TESTE FINAL ESPERADO
+
+Após rodar o sistema:
+
+- O usuário samuel@dnxtai.com deve acessar o painel completo
+- O chat e o chatbot devem funcionar 100%
+- Nenhum botão deve estar quebrado
+- Nenhum lead ou estatística falsa deve aparecer
+- O sistema deve estar pronto para uso em produção real
+
+---
+
+### USUÁRIOS QUE DEVEM FUNCIONAR
+
+| Email                   | Senha            | Permissão     |
+|------------------------|------------------|---------------|
+| samuel@dnxtai.com      | admin123         | Super Admin   |
+| leonardo@dnxtai.com    | admin123         | Super Admin   |
+| superpai@dnxtai.com    | admindnxt.leleo  | Super Admin   |
+
+---
+
+### OBSERVAÇÃO FINAL
+
+Este projeto é de produção. Não é uma versão de teste.  
+Tudo deve funcionar de ponta a ponta, com integração total entre frontend e backend.  
+O Replit deve rodar e manter o sistema 100% funcional para clientes reais.
