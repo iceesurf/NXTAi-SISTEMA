@@ -1,65 +1,94 @@
-# DNXT.ai - Plataforma SaaS Multi-Tenant Completa
+# 🚀 NXT.ai – Sistema Completo de Automação, CRM e Integrações
 
-Uma plataforma SaaS completa para automação de marketing, CRM, chatbot e integrações, desenvolvida em português brasileiro. Sistema totalmente funcional configurado para o domínio dnxtai.com.
+Este é o projeto **100% funcional e pronto para produção** da plataforma **NXT.ai**, criado por **Samuel Leucas**, inspirado em seu amigo **Leonardo**.
 
-## 🚀 Funcionalidades
+---
 
-### ✅ Principais Recursos Implementados
-- **Multi-Tenant**: Separação completa de dados por empresa (tenantId)
-- **Autenticação Completa**: Sistema de login/registro funcional com sessões
-- **CRM Completo**: Gestão de leads com importação CSV, tags e histórico
-- **Campanhas de Marketing**: Email e WhatsApp com editor visual
-- **Chatbot Inteligente**: Interface de chat com suporte a IA simulada
-- **Automações**: Workflows visuais com gatilhos e ações configuráveis
-- **Integrações**: ASAAS, WhatsApp, Slack, Google, SendGrid, RD Station
-- **API Pública**: REST API completa com documentação interativa
-- **Whitelabel**: Logos e cores personalizáveis por empresa
-- **Gestão de Equipe**: Usuários com diferentes permissões (Admin/User)
-- **Onboarding Interativo**: Guia passo-a-passo para novos usuários
-- **Dashboard Avançado**: Gráficos e métricas em tempo real
+## ✅ Visão Geral do Projeto
 
-### 🎨 Interface
-- **Design Moderno**: Interface responsiva com tema escuro/claro
-- **Cores DNXT.ai**: Roxo (#6E00FF), Rosa (#FF2CB4), Azul Neon (#00F5FF)
-- **Componentes**: Baseado em shadcn/ui com Tailwind CSS
-- **Acessibilidade**: Interface otimizada para diferentes dispositivos
+NXT.ai é uma plataforma SaaS white-label que une **automação de marketing**, **CRM inteligente**, **gestão de campanhas**, **agendamento de conteúdo**, **integrações com APIs externas** e **painel administrativo multi-tenant**. A estrutura é modular, robusta e preparada para escalar.
 
-### 🔐 Credenciais de Teste
-- **Email**: samuel@dnxtai.com
-- **Senha**: admin123
-- **Usuário Adicional**: leo@dnxtai.com / admin123
+---
 
-## 🛠️ Stack Tecnológica
+## 📦 Stack Tecnológica
 
-### Frontend
-- **React 19** com TypeScript
-- **Vite** para build e desenvolvimento
-- **Tailwind CSS** para estilização
-- **shadcn/ui** para componentes
-- **TanStack Query** para gerenciamento de estado
-- **Wouter** para roteamento
+- **Frontend**: React 19 + TypeScript, Vite, Tailwind CSS, shadcn/ui, Wouter
+- **Backend**: Node.js + Express, Passport.js, Drizzle ORM
+- **Banco de Dados**: PostgreSQL (multi-tenant)
+- **Auth**: Sessão com Express-session e Passport-local
+- **Deploy**: Replit com módulos nodejs-20, web, postgresql-16
 
-### Backend
-- **Node.js** com Express
-- **Drizzle ORM** com PostgreSQL
-- **Passport.js** para autenticação
-- **Session-based auth** com multi-tenant
+---
 
-### Banco de Dados
-- **PostgreSQL** com schema multi-tenant
-- **Drizzle ORM** para tipagem e migrações
-- **Relacionamentos** bem definidos entre entidades
+## ⚙️ Instalação (Replit)
 
-## 🔧 Configuração no Replit
+1. Faça upload do projeto no Replit.
+2. Configure as variáveis no painel `.env`:
 
-### 1. Configuração Inicial
-1. Faça fork deste repositório no Replit
-2. Configure as variáveis de ambiente baseadas no `.env.example`
-3. Execute `npm run db:push` para criar as tabelas
-4. Inicie o projeto com `npm run dev`
+```env
+DATABASE_URL=postgresql://user:senha@localhost:5432/dnxt
+SESSION_SECRET=sessao_segura_dnxt
+ASAAS_KEY=
+SENDGRID_KEY=
+RDSTATION_TOKEN=
+WHATSAPP_TOKEN=
+SLACK_WEBHOOK_URL=
+GOOGLE_CALENDAR_CREDENTIALS=
+TELEGRAM_BOT_TOKEN=
+```
 
-### 2. Variáveis de Ambiente Essenciais
+3. Execute no console:
+
 ```bash
-DATABASE_URL=postgresql://username:password@host:port/database
-SESSION_SECRET=sua-chave-secreta-super-segura
-NODE_ENV=development
+chmod +x setup.sh
+./setup.sh
+```
+
+---
+
+## 👥 Usuários Criados Automaticamente
+
+- **samuel@dnxtai.com** – senha: admin123
+- **leonardo@dnxtai.com** – senha: admin123
+- **superpai@dnxtai.com** – senha: admindnxt.leleo
+
+Todos com permissões superadmin.
+
+---
+
+## 🧠 Funcionalidades Confirmadas
+
+- ✅ Painel multiusuário com controle total
+- ✅ Chatbot com fluxo drag-and-drop e mensagens reais
+- ✅ Inbox e mensagens entre usuário e cliente
+- ✅ Agendamento de postagens (tipo SocialPilot)
+- ✅ CRM + campanhas segmentadas
+- ✅ Integrações com WhatsApp, Instagram, RD Station, ASAAS, etc.
+- ✅ Automações de marketing (boas-vindas, pós-venda, carrinho etc.)
+- ✅ Importação/Exportação via CSV e PDF
+- ✅ Visual dark/light, responsivo e white-label
+- ✅ Dados reais (sem dados fictícios ou simulados)
+
+---
+
+## 📣 Observação para Replit
+
+Este sistema está configurado para rodar 100% em produção. Nenhum dado fictício deve ser exibido. Todo o conteúdo e funcionalidades são reais, funcionais e devem iniciar corretamente ao rodar o setup.sh.
+
+---
+
+## 🤝 Licenciamento e Parcerias
+
+- Divisão de lucro sugerida: 50% para desenvolvedor / 50% para sócio comercial
+- Venda de licenças com marca própria (white-label)
+- Documentação de integração e onboarding disponível para parceiros
+
+---
+
+## 📬 Suporte
+
+Para dúvidas ou integração de novas APIs, entre em contato com samuel@dnxtai.com.
+
+---
+
+**NXT.ai – O futuro da automação acessível já começou.**
