@@ -16,7 +16,8 @@ import {
   Shield,
   Globe,
   GitBranch,
-  HelpCircle
+  HelpCircle,
+  Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/logo";
@@ -27,6 +28,7 @@ const menuItems = [
   { href: "/crm", label: "CRM & Leads", icon: Users },
   { href: "/campaigns", label: "Campanhas", icon: Mail },
   { href: "/chatbot", label: "Chatbot", icon: MessageCircle },
+  { href: "/content-scheduler", label: "Agendamento", icon: Calendar },
   { href: "/integrations", label: "Integrações", icon: Layers },
   { href: "/automations", label: "Automações", icon: Zap },
   { href: "/workflow-builder", label: "Fluxograma", icon: GitBranch },

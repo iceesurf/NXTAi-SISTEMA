@@ -8,6 +8,7 @@ import {
   automations, 
   apiKeys,
   siteRequests,
+  scheduledPosts,
   type User, 
   type InsertUser,
   type Tenant,
@@ -25,7 +26,9 @@ import {
   type ApiKey,
   type InsertApiKey,
   type SiteRequest,
-  type InsertSiteRequest
+  type InsertSiteRequest,
+  type ScheduledPost,
+  type InsertScheduledPost
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -91,6 +94,12 @@ export interface IStorage {
   updateSiteRequest(id: number, siteRequest: Partial<InsertSiteRequest>): Promise<SiteRequest>;
   deleteSiteRequest(id: number): Promise<void>;
   getAllSiteRequests(): Promise<SiteRequest[]>;
+  
+  // Scheduled Posts
+  getScheduledPostsByTenant(tenantId: number): Promise<ScheduledPost[]>;
+  createScheduledPost(post: InsertScheduledPost): Promise<ScheduledPost>;
+  updateScheduledPost(id: number, post: Partial<InsertScheduledPost>): Promise<ScheduledPost>;
+  deleteScheduledPost(id: number): Promise<void>;
   
   sessionStore: any;
 }
@@ -340,6 +349,36 @@ export class DatabaseStorage implements IStorage {
 
   async getAllSiteRequests(): Promise<SiteRequest[]> {
     return await db.select().from(siteRequests).orderBy(desc(siteRequests.createdAt));
+  }
+
+  // Scheduled Posts
+  async getScheduledPostsByTenant(tenantId: number): Promise<ScheduledPost[]> {
+    return await db
+      .select()
+      .from(scheduledPosts)
+      .where(eq(scheduledPosts.tenantId, tenantId))
+      .orderBy(desc(scheduledPosts.scheduledDate));
+  }
+
+  async createScheduledPost(insertPost: InsertScheduledPost): Promise<ScheduledPost> {
+    const [post] = await db
+      .insert(scheduledPosts)
+      .values(insertPost)
+      .returning();
+    return post;
+  }
+
+  async updateScheduledPost(id: number, updatePost: Partial<InsertScheduledPost>): Promise<ScheduledPost> {
+    const [post] = await db
+      .update(scheduledPosts)
+      .set({ ...updatePost, updatedAt: new Date() })
+      .where(eq(scheduledPosts.id, id))
+      .returning();
+    return post;
+  }
+
+  async deleteScheduledPost(id: number): Promise<void> {
+    await db.delete(scheduledPosts).where(eq(scheduledPosts.id, id));
   }
 }
 

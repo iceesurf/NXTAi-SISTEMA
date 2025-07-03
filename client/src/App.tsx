@@ -27,6 +27,7 @@ import AdminPanel from "@/pages/admin-panel";
 import SiteRequests from "@/pages/site-requests";
 import WorkflowBuilder from "@/pages/workflow-builder";
 import Help from "@/pages/help";
+import ContentScheduler from "@/pages/content-scheduler";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -96,6 +97,7 @@ function Router() {
               <Route path="/integrations" component={Integrations} />
               <Route path="/automations" component={Automations} />
               <Route path="/workflow-builder" component={WorkflowBuilder} />
+              <Route path="/content-scheduler" component={ContentScheduler} />
               <Route path="/site-requests" component={SiteRequests} />
               <Route path="/api" component={ApiDocs} />
               <Route path="/team" component={Team} />

@@ -135,6 +135,23 @@ export const siteRequests = pgTable("site_requests", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Scheduled Posts
+export const scheduledPosts = pgTable("scheduled_posts", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id).notNull(),
+  createdBy: integer("created_by").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  platform: text("platform").notNull(), // instagram, whatsapp, email, etc
+  scheduledDate: timestamp("scheduled_date").notNull(),
+  status: text("status").default("scheduled"), // scheduled, published, failed, cancelled
+  mediaUrls: text("media_urls").array(),
+  metadata: jsonb("metadata").default({}), // platform-specific data
+  publishedAt: timestamp("published_at"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const tenantsRelations = relations(tenants, ({ many }) => ({
   users: many(users),
@@ -227,6 +244,17 @@ export const siteRequestsRelations = relations(siteRequests, ({ one }) => ({
   }),
 }));
 
+export const scheduledPostsRelations = relations(scheduledPosts, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [scheduledPosts.tenantId],
+    references: [tenants.id],
+  }),
+  creator: one(users, {
+    fields: [scheduledPosts.createdBy],
+    references: [users.id],
+  }),
+}));
+
 // Schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
@@ -281,6 +309,13 @@ export const insertSiteRequestSchema = createInsertSchema(siteRequests).omit({
   updatedAt: true,
 });
 
+export const insertScheduledPostSchema = createInsertSchema(scheduledPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -308,3 +343,6 @@ export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
 
 export type SiteRequest = typeof siteRequests.$inferSelect;
 export type InsertSiteRequest = z.infer<typeof insertSiteRequestSchema>;
+
+export type ScheduledPost = typeof scheduledPosts.$inferSelect;
+export type InsertScheduledPost = z.infer<typeof insertScheduledPostSchema>;

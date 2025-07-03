@@ -176,6 +176,54 @@ export default function CRM() {
     });
   };
 
+  const importLeadsMutation = useMutation({
+    mutationFn: async (leads: Partial<InsertLead>[]) => {
+      const res = await apiRequest("POST", "/api/leads/bulk-import", { leads });
+      return res.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      toast({
+        title: "Importação concluída!",
+        description: `${result.success} leads importados com sucesso. ${result.errors || 0} erros.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na importação",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  const parseCSVRow = (row: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      const nextChar = row[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  };
+
   const handleImportClick = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -189,29 +237,119 @@ export default function CRM() {
         try {
           const csv = event.target?.result as string;
           const lines = csv.split('\n').filter(line => line.trim());
-          const headers = lines[0]?.split(',');
           
-          if (lines.length > 1) {
-            toast({
-              title: "Importação processada!",
-              description: `Arquivo com ${lines.length - 1} leads processado.`,
-            });
-          } else {
+          if (lines.length <= 1) {
             toast({
               title: "Arquivo vazio",
               description: "O arquivo CSV não contém dados válidos.",
               variant: "destructive",
             });
+            return;
           }
+
+          // Parse header row
+          const headerRow = parseCSVRow(lines[0]);
+          const normalizedHeaders = headerRow.map(h => h.toLowerCase().trim());
+          
+          // Map CSV columns to our lead fields
+          const fieldMapping: Record<string, string> = {
+            'nome': 'name',
+            'name': 'name',
+            'email': 'email',
+            'e-mail': 'email',
+            'telefone': 'phone',
+            'phone': 'phone',
+            'celular': 'phone',
+            'empresa': 'company',
+            'company': 'company',
+            'cargo': 'position',
+            'position': 'position',
+            'origem': 'source',
+            'source': 'source',
+            'status': 'status',
+            'notas': 'notes',
+            'notes': 'notes',
+            'observações': 'notes',
+            'observacoes': 'notes'
+          };
+
+          // Process data rows
+          const leadsToImport: Partial<InsertLead>[] = [];
+          const errors: string[] = [];
+
+          for (let i = 1; i < lines.length; i++) {
+            try {
+              const dataRow = parseCSVRow(lines[i]);
+              const leadData: Partial<InsertLead> = {};
+
+              // Map CSV data to lead fields
+              normalizedHeaders.forEach((header, index) => {
+                const fieldName = fieldMapping[header];
+                if (fieldName && dataRow[index]) {
+                  const value = dataRow[index].trim();
+                  if (value) {
+                    (leadData as any)[fieldName] = value;
+                  }
+                }
+              });
+
+              // Validate required fields
+              if (!leadData.name || !leadData.email) {
+                errors.push(`Linha ${i + 1}: Nome e email são obrigatórios`);
+                continue;
+              }
+
+              // Validate email format
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(leadData.email)) {
+                errors.push(`Linha ${i + 1}: Email inválido (${leadData.email})`);
+                continue;
+              }
+
+              // Set default status if not provided
+              if (!leadData.status) {
+                leadData.status = 'new';
+              }
+
+              leadsToImport.push(leadData);
+            } catch (error) {
+              errors.push(`Linha ${i + 1}: Erro no processamento dos dados`);
+            }
+          }
+
+          if (leadsToImport.length === 0) {
+            toast({
+              title: "Nenhum lead válido encontrado",
+              description: "Verifique o formato do arquivo CSV e tente novamente.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Show preview/confirmation if there are errors
+          if (errors.length > 0) {
+            const confirmImport = confirm(
+              `Encontrados ${errors.length} erros no arquivo.\n` +
+              `${leadsToImport.length} leads serão importados.\n\n` +
+              `Primeiros erros:\n${errors.slice(0, 3).join('\n')}\n\n` +
+              `Deseja continuar com a importação?`
+            );
+            
+            if (!confirmImport) return;
+          }
+
+          // Import leads
+          importLeadsMutation.mutate(leadsToImport);
+          
         } catch (error) {
           toast({
-            title: "Erro na importação",
+            title: "Erro na leitura do arquivo",
             description: "Formato de arquivo CSV inválido.",
             variant: "destructive",
           });
         }
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'UTF-8');
     };
     input.click();
   };

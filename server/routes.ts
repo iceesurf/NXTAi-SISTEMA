@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertLeadSchema, insertCampaignSchema, insertIntegrationSchema, insertAutomationSchema, insertSiteRequestSchema } from "@shared/schema";
+import { insertLeadSchema, insertCampaignSchema, insertIntegrationSchema, insertAutomationSchema, insertSiteRequestSchema, insertScheduledPostSchema } from "@shared/schema";
 import { randomBytes } from "crypto";
 
 function requireAuth(req: any, res: any, next: any) {
@@ -155,6 +155,59 @@ export function registerRoutes(app: Express): Server {
       res.sendStatus(204);
     } catch (error) {
       res.status(400).json({ message: "Erro ao deletar lead" });
+    }
+  });
+
+  // Bulk import leads
+  app.post("/api/leads/bulk-import", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const { leads } = req.body;
+      
+      if (!Array.isArray(leads) || leads.length === 0) {
+        return res.status(400).json({ message: "Lista de leads é obrigatória" });
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+      const errors: string[] = [];
+
+      for (const leadData of leads) {
+        try {
+          // Verificar se email já existe para este tenant
+          const existingLeads = await storage.getLeadsByTenant(user.tenantId);
+          const emailExists = existingLeads.some(l => l.email.toLowerCase() === leadData.email.toLowerCase());
+          
+          if (emailExists) {
+            errors.push(`Email ${leadData.email} já existe`);
+            errorCount++;
+            continue;
+          }
+
+          // Validar e criar lead
+          const validatedLead = insertLeadSchema.parse({
+            ...leadData,
+            tenantId: user.tenantId,
+            assignedTo: user.id
+          });
+          
+          await storage.createLead(validatedLead);
+          successCount++;
+        } catch (error: any) {
+          errorCount++;
+          errors.push(`Erro ao processar lead ${leadData.email}: ${error?.message || 'Erro desconhecido'}`);
+        }
+      }
+
+      res.json({
+        success: successCount,
+        errors: errorCount,
+        total: leads.length,
+        errorDetails: errors.slice(0, 10) // Limitar detalhes de erro
+      });
+    } catch (error) {
+      console.error("Erro na importação em lote:", error);
+      res.status(500).json({ message: "Erro interno na importação" });
     }
   });
 
@@ -638,6 +691,52 @@ export function registerRoutes(app: Express): Server {
       res.json(allSiteRequests);
     } catch (error) {
       res.status(500).json({ message: "Erro ao buscar todas as solicitações" });
+    }
+  });
+
+  // Scheduled Posts CRUD
+  app.get("/api/scheduled-posts", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const posts = await storage.getScheduledPostsByTenant(user.tenantId);
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar posts agendados" });
+    }
+  });
+
+  app.post("/api/scheduled-posts", requireAuth, async (req, res) => {
+    try {
+      const user = req.user!;
+      const postData = insertScheduledPostSchema.parse({
+        ...req.body,
+        tenantId: user.tenantId,
+        createdBy: user.id,
+      });
+      const post = await storage.createScheduledPost(postData);
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos para post agendado" });
+    }
+  });
+
+  app.put("/api/scheduled-posts/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const post = await storage.updateScheduledPost(parseInt(id), req.body);
+      res.json(post);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao atualizar post agendado" });
+    }
+  });
+
+  app.delete("/api/scheduled-posts/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteScheduledPost(parseInt(id));
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao deletar post agendado" });
     }
   });
 
