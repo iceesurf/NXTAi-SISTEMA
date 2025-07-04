@@ -179,6 +179,17 @@ Changelog:
   - ✅ Banco de dados limpo - apenas dados essenciais de produção
   - ✅ Setup.sh corrigido - não executa mais dados fictícios
   - ✅ Sistema pronto para clientes reais em produção no Replit
+- July 04, 2025. EDITOR DE FLUXOS AVANÇADO COM D3.JS INTEGRADO:
+  - ✅ Biblioteca D3.js adicionada para visualizações interativas
+  - ✅ Componente EditorFluxo com drag-and-drop, zoom e pan
+  - ✅ Editor visual com nós conectáveis (Início, Mensagem, Condição, Ação, Aguardar, Fim)
+  - ✅ Interface para editar propriedades dos nós (mensagens, condições, delays)
+  - ✅ Sistema de conexões visuais com setas direcionais
+  - ✅ Integração completa com APIs de fluxos de chatbot existentes
+  - ✅ Página flow-builder-advanced substituindo editor simples
+  - ✅ Controles de zoom, reset de visualização e modo de conexão
+  - ✅ Salvar/testar fluxos com dados reais do banco PostgreSQL
+  - ✅ Sistema 100% funcional testado com fluxos existentes
 
 ## Setup Automático
 

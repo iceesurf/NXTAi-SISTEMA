@@ -30,6 +30,7 @@ import Help from "@/pages/help";
 import ContentScheduler from "@/pages/content-scheduler";
 import Inbox from "@/pages/inbox";
 import FlowBuilder from "@/pages/flow-builder";
+import FlowBuilderAdvanced from "@/pages/flow-builder-advanced";
 import Layout from "@/components/layout";
 
 function ProtectedWrapper({ children }: { children: React.ReactNode }) {
@@ -98,6 +99,7 @@ function Router() {
               <Route path="/chatbot" component={Chatbot} />
               <Route path="/inbox" component={Inbox} />
               <Route path="/flow-builder" component={FlowBuilder} />
+              <Route path="/flow-builder-advanced" component={FlowBuilderAdvanced} />
               <Route path="/integrations" component={Integrations} />
               <Route path="/automations" component={Automations} />
               <Route path="/workflow-builder" component={WorkflowBuilder} />
