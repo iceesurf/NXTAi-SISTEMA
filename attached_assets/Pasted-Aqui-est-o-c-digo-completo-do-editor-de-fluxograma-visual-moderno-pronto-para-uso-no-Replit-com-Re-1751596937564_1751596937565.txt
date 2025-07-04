@@ -1,0 +1,158 @@
+Aqui está o código completo do editor de fluxograma visual moderno, pronto para uso no Replit com React + D3.js + TypeScript, com:
+	•	Blocos arrastáveis (gatilho, condição, ação)
+	•	Conexões dinâmicas com setas
+	•	Fluxo que não se apaga ao clicar
+	•	Tudo em português
+	•	Estilo roxo DNXT.ai
+	•	Pronto para produção
+
+⸻
+
+✅ Copie o código abaixo e cole no seu projeto React:
+
+// src/EditorFluxograma.tsx
+import React, { useState, useEffect, useRef } from "react";
+import * as d3 from "d3";
+
+type Node = {
+  id: string;
+  x: number;
+  y: number;
+  tipo: "gatilho" | "condicao" | "acao";
+  texto: string;
+};
+
+type Link = {
+  source: string;
+  target: string;
+};
+
+export default function EditorFluxograma() {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [links, setLinks] = useState<Link[]>([]);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const selectedNodeRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
+
+    svg.append("defs").append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 15)
+      .attr("refY", 0)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .attr("fill", "#999");
+
+    svg.selectAll("line")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("stroke", "#999")
+      .attr("stroke-width", 2)
+      .attr("x1", d => nodes.find(n => n.id === d.source)?.x + 60 || 0)
+      .attr("y1", d => nodes.find(n => n.id === d.source)?.y + 20 || 0)
+      .attr("x2", d => nodes.find(n => n.id === d.target)?.x + 60 || 0)
+      .attr("y2", d => nodes.find(n => n.id === d.target)?.y + 20 || 0)
+      .attr("marker-end", "url(#arrow)");
+
+    const group = svg.selectAll("g")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("transform", d => `translate(${d.x}, ${d.y})`)
+      .call(d3.drag<SVGGElement, Node>()
+        .on("drag", (event, d) => {
+          d.x = event.x;
+          d.y = event.y;
+          setNodes([...nodes]);
+        })
+      )
+      .on("click", (_, d) => {
+        if (selectedNodeRef.current && selectedNodeRef.current !== d.id) {
+          const alreadyLinked = links.some(l => l.source === selectedNodeRef.current && l.target === d.id);
+          if (!alreadyLinked) {
+            setLinks([...links, { source: selectedNodeRef.current, target: d.id }]);
+          }
+          selectedNodeRef.current = null;
+        } else {
+          selectedNodeRef.current = d.id;
+        }
+      });
+
+    group.append("rect")
+      .attr("width", 120)
+      .attr("height", 40)
+      .attr("fill", d => {
+        if (d.tipo === "gatilho") return "#7C2DF1";
+        if (d.tipo === "condicao") return "#3B82F6";
+        return "#10B981";
+      })
+      .attr("rx", 6)
+      .attr("ry", 6);
+
+    group.append("text")
+      .text(d => d.texto)
+      .attr("x", 10)
+      .attr("y", 25)
+      .attr("fill", "white");
+  }, [nodes, links]);
+
+  const adicionarNo = (tipo: Node["tipo"]) => {
+    const novo: Node = {
+      id: Date.now().toString(),
+      x: 100 + nodes.length * 30,
+      y: 100 + nodes.length * 30,
+      tipo,
+      texto: tipo.charAt(0).toUpperCase() + tipo.slice(1)
+    };
+    setNodes([...nodes, novo]);
+  };
+
+  const salvarFluxo = () => {
+    const fluxo = { nodes, links };
+    console.log("Fluxograma:", fluxo);
+    alert("Fluxo salvo no console.");
+  };
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2>Editor de Fluxograma – DNXT.ai</h2>
+      <div style={{ marginBottom: "1rem" }}>
+        <button onClick={() => adicionarNo("gatilho")}>+ Gatilho</button>
+        <button onClick={() => adicionarNo("condicao")}>+ Condição</button>
+        <button onClick={() => adicionarNo("acao")}>+ Ação</button>
+        <button onClick={salvarFluxo}>Salvar</button>
+      </div>
+      <svg ref={svgRef} width={1000} height={600} style={{ border: "1px solid #ccc" }}></svg>
+    </div>
+  );
+}
+
+
+⸻
+
+✅ Como usar no Replit
+	1.	Crie um projeto com React + TypeScript
+	2.	Instale o D3.js:
+
+npm install d3
+
+
+	3.	Crie o arquivo EditorFluxograma.tsx com o código acima
+	4.	Importe e use no App.tsx:
+
+import EditorFluxograma from './EditorFluxograma';
+function App() {
+  return <EditorFluxograma />;
+}
+export default App;
+
+
+
+Se quiser que eu adicione salvamento no banco e integração com o backend DNXT.ai, posso gerar o backend completo agora. Deseja isso também? ￼

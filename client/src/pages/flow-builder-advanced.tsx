@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Header from "@/components/header";
-import EditorFluxo from "@/components/editor-fluxo";
+import EditorFluxogramaModerno from "@/components/editor-fluxograma-moderno";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
@@ -416,52 +416,69 @@ export default function FlowBuilderAdvanced() {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-0">
+              <CardContent className="p-4">
                 <div className="h-[600px]">
-                  <EditorFluxo
-                    flowData={selectedFlow.flowData ? {
-                      nodes: (selectedFlow.flowData as FlowData).nodes.map(node => ({
+                  <EditorFluxogramaModerno
+                    fluxoInicial={selectedFlow ? {
+                      id: selectedFlow.id,
+                      nome: selectedFlow.name,
+                      descricao: selectedFlow.description,
+                      trigger: selectedFlow.trigger,
+                      isActive: selectedFlow.isActive,
+                      nodes: (selectedFlow.flowData as FlowData)?.nodes?.map(node => ({
                         id: node.id,
-                        x: node.position.x,
-                        y: node.position.y,
-                        type: node.type,
-                        label: node.data.label,
-                        data: node.data
-                      })),
-                      links: (selectedFlow.flowData as FlowData).connections.map(conn => ({
-                        source: conn.from,
-                        target: conn.to,
-                        label: conn.condition
-                      }))
-                    } : { nodes: [], links: [] }}
-                    onSave={(flowData) => {
+                        x: node.position?.x || 100,
+                        y: node.position?.y || 100,
+                        tipo: node.type === 'start' ? 'gatilho' : 
+                              node.type === 'end' ? 'fim' :
+                              node.type === 'wait' ? 'aguardar' :
+                              node.type === 'condition' ? 'condicao' : 'acao',
+                        texto: node.data?.label || 'Novo Nó',
+                        configuracao: {
+                          mensagem: node.data?.content,
+                          condicoes: node.data?.conditions,
+                          delay: node.data?.delay,
+                          acaoTipo: node.data?.actionType
+                        }
+                      })) || [],
+                      links: (selectedFlow.flowData as FlowData)?.connections?.map(link => ({
+                        source: link.from,
+                        target: link.to,
+                        condicao: link.condition
+                      })) || []
+                    } : undefined}
+                    onSalvar={(fluxo) => {
                       const updatedFlowData: FlowData = {
-                        nodes: flowData.nodes.map(node => ({
+                        nodes: fluxo.nodes.map(node => ({
                           id: node.id,
-                          type: node.type,
+                          type: node.tipo === 'gatilho' ? 'start' : 
+                                node.tipo === 'fim' ? 'end' :
+                                node.tipo === 'aguardar' ? 'wait' :
+                                node.tipo === 'condicao' ? 'condition' : 'action',
                           position: { x: node.x, y: node.y },
                           data: {
-                            label: node.label,
-                            ...node.data
+                            label: node.texto,
+                            content: node.configuracao?.mensagem || "",
+                            conditions: node.configuracao?.condicoes || [],
+                            delay: node.configuracao?.delay || 0,
+                            actionType: node.configuracao?.acaoTipo || ""
                           },
-                          connections: flowData.links
-                            .filter(link => link.source === node.id)
-                            .map(link => link.target)
+                          connections: fluxo.links.filter(l => l.source === node.id).map(l => l.target)
                         })),
-                        connections: flowData.links.map(link => ({
+                        connections: fluxo.links.map(link => ({
                           from: link.source,
                           to: link.target,
-                          condition: link.label
+                          condition: link.condicao
                         }))
                       };
                       
                       updateFlowMutation.mutate({
-                        id: selectedFlow.id,
+                        id: selectedFlow!.id,
                         data: { flowData: updatedFlowData }
                       });
                     }}
-                    onTest={(flowData) => {
-                      testFlowMutation.mutate(selectedFlow.id);
+                    onTestar={(fluxo) => {
+                      testFlowMutation.mutate(selectedFlow!.id);
                     }}
                   />
                 </div>
