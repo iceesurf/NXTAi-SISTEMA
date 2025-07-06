@@ -203,15 +203,4 @@ router.post('/forgot-password', async (req, res) => {
   // 3. Envia email com link contendo token (exemplo: /reset-password/:token)
   // ...
 });
-
-// Rota para finalizar reset (salvar nova senha)
-const express = require('express'); // ou import express from 'express' se estiver usando ES6
-router.post('/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-  // 1. Valida token
-  // 2. Salva nova senha
-  // 3. Retorna sucesso ou erro
-  // ...
-});
-
 }
