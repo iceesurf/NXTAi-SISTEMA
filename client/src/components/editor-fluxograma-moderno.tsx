@@ -1,37 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Plus, Save, Play, Trash2, Edit, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Plus, Save, Play, ZoomIn, ZoomOut, RotateCcw, Trash2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { apiRequest } from "@/lib/api-request";
 
 type NodeType = "gatilho" | "condicao" | "acao" | "aguardar" | "fim";
-
 type FluxoNode = {
   id: string;
   x: number;
   y: number;
   tipo: NodeType;
   texto: string;
-  configuracao?: {
+  configuracao: {
     mensagem?: string;
     condicoes?: string[];
     delay?: number;
     acaoTipo?: string;
   };
 };
-
 type FluxoLink = {
   source: string;
   target: string;
   condicao?: string;
 };
-
 type FluxoCompleto = {
   id?: number;
   nome: string;
@@ -41,7 +38,6 @@ type FluxoCompleto = {
   trigger: string;
   isActive: boolean | null;
 };
-
 interface EditorFluxogramaModernoProps {
   fluxoInicial?: FluxoCompleto;
   onSalvar?: (fluxo: FluxoCompleto) => void;
@@ -62,25 +58,22 @@ export default function EditorFluxogramaModerno({
     trigger: "new_lead",
     isActive: false
   });
-  
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [editingNode, setEditingNode] = useState<FluxoNode | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  
   const svgRef = useRef<SVGSVGElement>(null);
   const isDraggingRef = useRef(false);
 
   const nodeColors = {
-    gatilho: "#7C2DF1", // Roxo principal DNXT.ai
-    condicao: "#3B82F6", // Azul para condições
-    acao: "#10B981", // Verde para ações
-    aguardar: "#F59E0B", // Amarelo para aguardar
-    fim: "#EF4444" // Vermelho para fim
+    gatilho: "#7C2DF1",
+    condicao: "#3B82F6",
+    acao: "#10B981",
+    aguardar: "#F59E0B",
+    fim: "#EF4444"
   };
-
   const nodeLabels = {
     gatilho: "Gatilho",
     condicao: "Condição", 
@@ -91,17 +84,15 @@ export default function EditorFluxogramaModerno({
 
   useEffect(() => {
     renderFluxograma();
-  }, [fluxo.nodes, fluxo.links, zoom, pan, selectedNode]);
+  }, [fluxo.nodes, fluxo.links, zoom, pan, selectedNode, isConnecting, isEditDialogOpen]);
 
   const renderFluxograma = () => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    // Configurar zoom/pan
     const container = svg.append("g")
       .attr("transform", `translate(${pan.x}, ${pan.y}) scale(${zoom})`);
 
-    // Definir marcadores para setas
     svg.append("defs").append("marker")
       .attr("id", "arrow")
       .attr("viewBox", "0 -5 10 10")
@@ -114,7 +105,7 @@ export default function EditorFluxogramaModerno({
       .attr("d", "M0,-5L10,0L0,5")
       .attr("fill", "#6B7280");
 
-    // Renderizar conexões
+    // Linhas
     container.selectAll("line")
       .data(fluxo.links)
       .enter()
@@ -140,80 +131,60 @@ export default function EditorFluxogramaModerno({
       .attr("marker-end", "url(#arrow)")
       .style("cursor", "pointer")
       .on("click", (event, d) => {
-        // Remover conexão ao clicar
         setFluxo(prev => ({
           ...prev,
           links: prev.links.filter(l => l.source !== d.source || l.target !== d.target)
         }));
       });
 
-    // Renderizar nós
+    // Nós com drag-and-drop
     const nodeGroups = container.selectAll("g.node")
       .data(fluxo.nodes)
       .enter()
       .append("g")
       .attr("class", "node")
       .attr("transform", d => `translate(${d.x}, ${d.y})`)
-      .style("cursor", "move")
-      .call(d3.drag<SVGGElement, FluxoNode>()
-        .on("start", () => {
-          isDraggingRef.current = false;
-        })
-        .on("drag", (event, d) => {
-          isDraggingRef.current = true;
-          d.x = event.x;
-          d.y = event.y;
-          setFluxo(prev => ({ ...prev, nodes: [...prev.nodes] }));
-        })
-        .on("end", () => {
-          setTimeout(() => {
-            isDraggingRef.current = false;
-          }, 100);
-        })
+      .style("cursor", isConnecting ? "crosshair" : "move")
+      .call(
+        d3.drag<SVGGElement, FluxoNode>()
+          .on("start", function (event, d) { isDraggingRef.current = false; })
+          .on("drag", function (event, d) {
+            isDraggingRef.current = true;
+            d.x = event.x;
+            d.y = event.y;
+            setFluxo(prev => ({
+              ...prev,
+              nodes: prev.nodes.map(n => n.id === d.id ? { ...n, x: d.x, y: d.y } : n)
+            }));
+          })
+          .on("end", function () { setTimeout(() => { isDraggingRef.current = false; }, 100); })
       )
       .on("click", (event, d) => {
         event.stopPropagation();
         if (isDraggingRef.current) return;
-        
         if (isConnecting) {
           if (selectedNode && selectedNode !== d.id) {
-            // Criar conexão entre nós
-            const alreadyConnected = fluxo.links.some(l => 
-              l.source === selectedNode && l.target === d.id
-            );
-            
+            const alreadyConnected = fluxo.links.some(l => l.source === selectedNode && l.target === d.id);
             if (!alreadyConnected) {
               setFluxo(prev => ({
                 ...prev,
                 links: [...prev.links, { source: selectedNode, target: d.id }]
               }));
-              
-              toast({
-                title: "Conexão criada",
-                description: "Os nós foram conectados com sucesso!"
-              });
+              toast({ title: "Conexão criada", description: "Os nós foram conectados com sucesso!" });
             }
-            
             setSelectedNode(null);
             setIsConnecting(false);
           } else {
-            // Selecionar nó para conexão
             setSelectedNode(d.id);
-            toast({
-              title: "Nó selecionado",
-              description: "Agora clique em outro nó para criar a conexão."
-            });
+            toast({ title: "Nó selecionado", description: "Agora clique em outro nó para criar a conexão." });
           }
         } else {
-          // Modo normal: editar nó com duplo clique
-          // Clique simples apenas seleciona
           setSelectedNode(selectedNode === d.id ? null : d.id);
         }
       })
       .on("dblclick", (event, d) => {
         event.stopPropagation();
         if (!isConnecting) {
-          // Duplo clique para editar
           setEditingNode(d);
           setIsEditDialogOpen(true);
         }
@@ -225,8 +196,8 @@ export default function EditorFluxogramaModerno({
       .attr("height", 50)
       .attr("fill", d => nodeColors[d.tipo])
       .attr("stroke", d => {
-        if (selectedNode === d.id && isConnecting) return "#FFD700"; // Dourado para modo conexão
-        if (selectedNode === d.id) return "#FFFFFF"; // Branco para seleção normal
+        if (selectedNode === d.id && isConnecting) return "#FFD700";
+        if (selectedNode === d.id) return "#FFFFFF";
         return "transparent";
       })
       .attr("stroke-width", 3)
@@ -278,12 +249,10 @@ export default function EditorFluxogramaModerno({
       texto: nodeLabels[tipo],
       configuracao: {}
     };
-
     setFluxo(prev => ({
       ...prev,
       nodes: [...prev.nodes, novoNo]
     }));
-
     toast({
       title: "Nó adicionado",
       description: `Nó do tipo "${nodeLabels[tipo]}" foi adicionado ao fluxo.`
@@ -300,7 +269,6 @@ export default function EditorFluxogramaModerno({
 
   const salvarFluxo = async () => {
     try {
-      // Converter para formato do banco
       const flowData = {
         nodes: fluxo.nodes.map(node => ({
           id: node.id,
@@ -323,7 +291,6 @@ export default function EditorFluxogramaModerno({
           condition: link.condicao
         }))
       };
-
       if (fluxo.id) {
         await apiRequest("PUT", `/api/chatbot/flows/${fluxo.id}`, {
           name: fluxo.nome,
@@ -341,15 +308,8 @@ export default function EditorFluxogramaModerno({
           isActive: fluxo.isActive
         });
       }
-
-      if (onSalvar) {
-        onSalvar(fluxo);
-      }
-
-      toast({
-        title: "Fluxo salvo",
-        description: "O fluxo foi salvo com sucesso!"
-      });
+      if (onSalvar) { onSalvar(fluxo); }
+      toast({ title: "Fluxo salvo", description: "O fluxo foi salvo com sucesso!" });
     } catch (error: any) {
       toast({
         title: "Erro ao salvar",
@@ -361,10 +321,7 @@ export default function EditorFluxogramaModerno({
 
   const testarFluxo = async () => {
     try {
-      if (onTestar) {
-        onTestar(fluxo);
-      }
-      
+      if (onTestar) { onTestar(fluxo); }
       toast({
         title: "Teste iniciado",
         description: "O fluxo está sendo testado..."
@@ -458,7 +415,6 @@ export default function EditorFluxogramaModerno({
                 Fim
               </Button>
             </div>
-
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => {
@@ -536,7 +492,6 @@ export default function EditorFluxogramaModerno({
                   onChange={(e) => setEditingNode({ ...editingNode, texto: e.target.value })}
                 />
               </div>
-              
               {editingNode.tipo === "acao" && (
                 <div>
                   <Label htmlFor="mensagem">Mensagem</Label>
@@ -551,7 +506,6 @@ export default function EditorFluxogramaModerno({
                   />
                 </div>
               )}
-
               {editingNode.tipo === "aguardar" && (
                 <div>
                   <Label htmlFor="delay">Tempo de Espera (segundos)</Label>
@@ -566,7 +520,6 @@ export default function EditorFluxogramaModerno({
                   />
                 </div>
               )}
-
               <div className="flex justify-between">
                 <Button
                   onClick={() => {
