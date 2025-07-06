@@ -193,4 +193,21 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
+// Rota para iniciar reset (enviar link por email)
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  // 1. Verifica se email existe
+  // 2. Gera token de reset
+  // 3. Envia email com link contendo token (exemplo: /reset-password/:token)
+  // ...
+});
+
+// Rota para finalizar reset (salvar nova senha)
+router.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+  // 1. Valida token
+  // 2. Salva nova senha
+  // 3. Retorna sucesso ou erro
+  // ...
+});
 }
