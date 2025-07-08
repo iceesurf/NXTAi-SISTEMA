@@ -1,112 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>DNXT.ai - Plataforma SaaS Completa</title>
-    <meta name="description" content="Plataforma SaaS multi-tenant com CRM, campanhas, chatbot e integrações. Automatize seu marketing e vendas com IA." />
-    <meta name="keywords" content="SaaS, CRM, Marketing, Automação, Chatbot, Leads, Campanhas" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://dnxtai.com/" />
-    <meta property="og:title" content="DNXT.ai - Plataforma SaaS Completa" />
-    <meta property="og:description" content="Automatize seu marketing e vendas com nossa plataforma completa de CRM, campanhas e IA" />
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://dnxtai.com/" />
-    <meta property="twitter:title" content="DNXT.ai - Plataforma SaaS Completa" />
-    <meta property="twitter:description" content="Automatize seu marketing e vendas com nossa plataforma completa de CRM, campanhas e IA" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9J2dyYWQnIHgxPScwJScgeTE9JzAlJyB4Mj0nMTAwJScgeTI9JzEwMCUnPjxzdG9wIG9mZnNldD0nMCUnIHN0eWxlPSdzdG9wLWNvbG9yOiM2RTAwRkY7c3RvcC1vcGFjaXR5OjEnIC8+PHN0b3Agb2Zmc2V0PSc1MCUnIHN0eWxlPSdzdG9wLWNvbG9yOiM5QTRERkY7c3RvcC1vcGFjaXR5OjEnIC8+PHN0b3Agb2Zmc2V0PScxMDAlJyBzdHlsZT0nc3RvcC1jb2xvcjojNEIwMDgyO3N0b3Atb3BhY2l0eToxJyAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJyByeD0nMjAnIGZpbGw9J3VybCgjZ3JhZCknLz48dGV4dCB4PSc1MCcgeT0nNjUnIGZvbnQtZmFtaWx5PSdBcmlhbCxzYW5zLXNlcmlmJyBmb250LXNpemU9JzQ1JyBmb250LXdlaWdodD0nYm9sZCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nd2hpdGUnPkQ8L3RleHQ+PC9zdmc+" />
-    
-    <!-- Preconnect to improve performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    
-    <!-- Theme Colors -->
-    <meta name="theme-color" content="#6E00FF" />
-    <meta name="msapplication-TileColor" content="#6E00FF" />
-    
-    <style>
-      /* Loading animation */
-      .nxt-loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #6E00FF 0%, #FF2CB4 50%, #00F5FF 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        animation: fadeOut 0.5s ease-in-out 2s forwards;
-      }
-      
-      .nxt-logo {
-        width: 80px;
-        height: 80px;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Inter', sans-serif;
-        font-size: 36px;
-        font-weight: 700;
-        color: white;
-        animation: pulse 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-      }
-      
-      @keyframes fadeOut {
-        to { opacity: 0; visibility: hidden; }
-      }
-      
-      /* Hide content until loaded */
-      #root {
-        opacity: 0;
-        animation: fadeIn 0.5s ease-in-out 2.5s forwards;
-      }
-      
-      @keyframes fadeIn {
-        to { opacity: 1; }
-      }
-    </style>
+    <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>NXT.ai – Plataforma de Automação e CRM</title>
+    <meta name="description" content="Sistema completo de automação, CRM, chat ao vivo e editor de fluxo para sua empresa."/>
+    <meta name="robots" content="index, follow"/>
+    <meta property="og:title" content="NXT.ai – Automação Inteligente"/>
+    <meta property="og:description" content="Automatize sua empresa com NXT.ai: chat, CRM, integração e muito mais."/>
+    <meta property="og:image" content="https://seusite.com/preview.jpg"/>
+    <meta property="og:url" content="https://seusite.com/"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <link rel="icon" href="/favicon.ico"/>
   </head>
-  <body>
-    <!-- Loading Screen -->
-    <div class="nxt-loader">
-      <div class="nxt-logo">N</div>
-    </div>
-    
-    <!-- Main App -->
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Development banner for Replit -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
-    
-    <!-- Remove loading screen after app loads -->
-    <script>
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          const loader = document.querySelector('.nxt-loader');
-          if (loader) {
-            loader.style.display = 'none';
-          }
-        }, 2500);
-      });
-    </script>
-  </body>
+  <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
 </html>
